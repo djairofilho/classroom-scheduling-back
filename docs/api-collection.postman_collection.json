@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "d86ee742-4e9c-43d7-9e85-f25ce309db49",
-    "name": "Template25 API",
+    "_postman_id": "f90b4a33-c746-4a22-a3eb-0e7b99d1f067",
+    "name": "Classroom Scheduler API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -10,24 +10,73 @@
       "value": "http://localhost:8080"
     },
     {
-      "key": "clienteId",
+      "key": "salaId",
       "value": "1"
     },
     {
-      "key": "produtoId",
+      "key": "usuarioId",
       "value": "1"
     },
     {
-      "key": "vendaId",
+      "key": "reservaId",
+      "value": "1"
+    },
+    {
+      "key": "manutencaoId",
       "value": "1"
     }
   ],
   "item": [
     {
-      "name": "Clientes",
+      "name": "Salas",
       "item": [
         {
-          "name": "Criar cliente",
+          "name": "Listar salas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/salas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar salas disponiveis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/salas/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capacidadeMinima=30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas",
+                "disponiveis"
+              ],
+              "query": [
+                {
+                  "key": "inicio",
+                  "value": "2026-05-10T10:00:00"
+                },
+                {
+                  "key": "fim",
+                  "value": "2026-05-10T12:00:00"
+                },
+                {
+                  "key": "capacidadeMinima",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar sala",
           "request": {
             "method": "POST",
             "header": [
@@ -38,88 +87,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Maria Silva\",\n  \"email\": \"maria@email.com\"\n}"
+              "raw": "{\n  \"nome\": \"Sala B201\",\n  \"capacidade\": 40,\n  \"predioId\": 1,\n  \"recursoIds\": [1, 2]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/clientes",
+              "raw": "{{baseUrl}}/salas",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "clientes"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Listar clientes",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/clientes",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "clientes"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Buscar cliente",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/clientes/{{clienteId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "clientes",
-                "{{clienteId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Atualizar cliente",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nome\": \"Maria Souza\",\n  \"email\": \"maria.souza@email.com\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/clientes/{{clienteId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "clientes",
-                "{{clienteId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Deletar cliente",
-          "request": {
-            "method": "DELETE",
-            "url": {
-              "raw": "{{baseUrl}}/clientes/{{clienteId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "clientes",
-                "{{clienteId}}"
+                "salas"
               ]
             }
           }
@@ -127,10 +103,10 @@
       ]
     },
     {
-      "name": "Produtos",
+      "name": "Reservas",
       "item": [
         {
-          "name": "Criar produto",
+          "name": "Criar reserva",
           "request": {
             "method": "POST",
             "header": [
@@ -141,88 +117,48 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Notebook\",\n  \"preco\": 3500.0,\n  \"estoque\": 10\n}"
+              "raw": "{\n  \"usuarioId\": {{usuarioId}},\n  \"salaId\": {{salaId}},\n  \"inicio\": \"2026-05-10T10:00:00\",\n  \"fim\": \"2026-05-10T12:00:00\",\n  \"motivo\": \"Estudo em grupo\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/produtos",
+              "raw": "{{baseUrl}}/reservas",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "produtos"
+                "reservas"
               ]
             }
           }
         },
         {
-          "name": "Listar produtos",
+          "name": "Listar minhas reservas",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/produtos",
+              "raw": "{{baseUrl}}/reservas/minhas",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "produtos"
+                "reservas",
+                "minhas"
               ]
             }
           }
         },
         {
-          "name": "Buscar produto",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/produtos/{{produtoId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "produtos",
-                "{{produtoId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Atualizar produto",
+          "name": "Cancelar reserva",
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nome\": \"Notebook Pro\",\n  \"preco\": 4200.0,\n  \"estoque\": 8\n}"
-            },
             "url": {
-              "raw": "{{baseUrl}}/produtos/{{produtoId}}",
+              "raw": "{{baseUrl}}/reservas/{{reservaId}}/cancelar",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "produtos",
-                "{{produtoId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Deletar produto",
-          "request": {
-            "method": "DELETE",
-            "url": {
-              "raw": "{{baseUrl}}/produtos/{{produtoId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "produtos",
-                "{{produtoId}}"
+                "reservas",
+                "{{reservaId}}",
+                "cancelar"
               ]
             }
           }
@@ -230,10 +166,10 @@
       ]
     },
     {
-      "name": "Vendas",
+      "name": "Manutencoes",
       "item": [
         {
-          "name": "Criar venda",
+          "name": "Criar manutencao",
           "request": {
             "method": "POST",
             "header": [
@@ -244,62 +180,35 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"produtoId\": {{produtoId}},\n  \"quantidade\": 2,\n  \"data\": \"2026-03-21\"\n}"
+              "raw": "{\n  \"inicio\": \"2026-05-11T08:00:00\",\n  \"fim\": \"2026-05-11T18:00:00\",\n  \"motivo\": \"Manutencao do projetor\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/vendas",
+              "raw": "{{baseUrl}}/salas/{{salaId}}/manutencoes",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "vendas"
+                "salas",
+                "{{salaId}}",
+                "manutencoes"
               ]
             }
           }
         },
         {
-          "name": "Listar vendas",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/vendas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "vendas"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Buscar venda",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/vendas/{{vendaId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "vendas",
-                "{{vendaId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Deletar venda",
+          "name": "Remover manutencao",
           "request": {
             "method": "DELETE",
             "url": {
-              "raw": "{{baseUrl}}/vendas/{{vendaId}}",
+              "raw": "{{baseUrl}}/salas/{{salaId}}/manutencoes/{{manutencaoId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "vendas",
-                "{{vendaId}}"
+                "salas",
+                "{{salaId}}",
+                "manutencoes",
+                "{{manutencaoId}}"
               ]
             }
           }
