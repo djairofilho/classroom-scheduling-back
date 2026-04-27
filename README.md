@@ -79,7 +79,7 @@ O projeto segue uma arquitetura em camadas com Spring Boot:
 Estrutura atual do codigo:
 
 ```text
-src/main/java/com/seuprojeto/api
+src/main/java/com/classroomscheduler
 |-- controller
 |-- dto
 |-- exception
