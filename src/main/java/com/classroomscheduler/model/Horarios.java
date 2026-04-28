@@ -2,15 +2,9 @@ package com.classroomscheduler.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Embeddable
 public class Horarios {
 
@@ -19,6 +13,9 @@ public class Horarios {
 
     @Column(name = "fim", nullable = false)
     private LocalDateTime fim;
+
+    public Horarios() {
+    }
 
     public boolean conflita(Horarios outro) {
         if (outro == null || inicio == null || fim == null || outro.inicio == null || outro.fim == null) {
@@ -36,5 +33,21 @@ public class Horarios {
         if (!fim.isAfter(inicio)) {
             throw new IllegalStateException("Fim deve ser posterior ao inicio.");
         }
+    }
+
+    public LocalDateTime getInicio() {
+        return inicio;
+    }
+
+    public void setInicio(LocalDateTime inicio) {
+        this.inicio = inicio;
+    }
+
+    public LocalDateTime getFim() {
+        return fim;
+    }
+
+    public void setFim(LocalDateTime fim) {
+        this.fim = fim;
     }
 }
