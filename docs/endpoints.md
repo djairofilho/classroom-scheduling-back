@@ -41,7 +41,7 @@ GET /espacos/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capa
 
 ### `POST /espacos`
 
-Cria um novo espaco. Endpoint administrativo.
+Cria um novo espaco concreto. Endpoint administrativo e util para montar o fluxo completo de testes.
 
 Exemplo de body:
 
@@ -53,6 +53,13 @@ Exemplo de body:
   "predioId": 1
 }
 ```
+
+Tipos aceitos em `tipo`:
+
+- `SALA`
+- `AUDITORIO`
+- `QUADRA`
+- `LABORATORIO`
 
 ### `PATCH /espacos/{id}/indisponibilidade`
 
