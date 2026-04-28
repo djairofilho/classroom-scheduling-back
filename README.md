@@ -1,69 +1,69 @@
 # Classroom Scheduler
 
-Sistema para agendamento de salas da faculdade, com foco em evitar conflitos de horario e manter as regras de reserva bem definidas no dominio.
+Sistema para agendamento de espacos da faculdade, com foco em evitar conflitos de horario e manter as regras de reserva bem definidas no dominio.
 
 ## Objetivo
 
-O projeto organiza o processo de reserva de salas academicas de forma simples e clara. A proposta prioriza:
+O projeto organiza o processo de reserva de espacos academicos de forma simples e clara. A proposta prioriza:
 
 - modelagem de dominio bem estruturada
 - separacao de responsabilidades entre camadas
 - regras de negocio centralizadas
-- API REST para operacoes principais de consulta e reserva
+- API REST para operacoes principais de consulta, reserva e notificacao
 
 ## Escopo funcional
 
-### Usuario comum
+### Solicitante
 
-- Ver salas disponiveis
-- Filtrar salas por capacidade
+- Ver espacos disponiveis
+- Filtrar espacos por capacidade, tipo e predio
 - Criar reserva
 - Cancelar a propria reserva
 - Consultar suas reservas
+- Receber notificacoes sobre alteracoes nas reservas
 
-### Administrador
+### Admin
 
-- Criar salas
-- Definir capacidade
-- Adicionar recursos
-- Bloquear salas para manutencao
+- Criar espacos
+- Definir capacidade e localizacao
+- Marcar indisponibilidade de espacos
 - Cancelar qualquer reserva
+- Consultar notificacoes emitidas pelo sistema
 
 ## Dominio do problema
 
 O sistema foi planejado para destacar conceitos importantes de orientacao a objetos e modelagem:
 
-- Heranca em `Usuario`, com especializacoes `Aluno`, `Professor` e `Administrador`
-- Composicao entre `Reserva` e `Horario`
-- Associacoes entre `Sala`, `Predio`, `Recurso` e `Manutencao`
-- Regras encapsuladas em `PoliticaReserva`
-- Estados da reserva representados por `StatusReserva`
+- Heranca em `Usuario`, com especializacoes `Admin` e `Solicitante`
+- Generalizacao em `Espaco`, com especializacoes `Sala`, `Auditorio`, `Quadra` e `Laboratorio`
+- Composicao entre `Reserva` e `Horarios`
+- Associacoes entre `Espaco`, `Predio` e `Notificacao`
+- Regras de reserva centralizadas no dominio
 
 Os principais elementos do dominio sao:
 
 - `Usuario`
-- `Aluno`
-- `Professor`
-- `Administrador`
-- `Sala`
+- `Admin`
+- `Solicitante`
 - `Predio`
-- `Recurso`
 - `Reserva`
-- `Horario`
-- `Manutencao`
-- `PoliticaReserva`
-- `StatusReserva`
-- `TipoUsuario`
+- `Horarios`
+- `Notificacao`
+- `Espaco`
+- `Sala`
+- `Auditorio`
+- `Quadra`
+- `Laboratorio`
 
 ## Regras de negocio centrais
 
-- Nao pode existir reserva em conflito de horario para a mesma sala
-- Nao pode reservar sala bloqueada por manutencao
-- O horario deve ser valido, com fim posterior ao inicio
+- Nao pode existir reserva em conflito de horario para o mesmo espaco
+- Nao pode reservar espaco indisponivel
+- `Horarios` deve ser valido, com fim posterior ao inicio
 - Nao pode criar reserva no passado
-- Aluno possui limite de duracao da reserva
-- Professor possui maior flexibilidade de reserva
-- Administrador pode cancelar qualquer reserva
+- O `Solicitante` pode cancelar apenas a propria reserva
+- O `Admin` pode cancelar qualquer reserva
+- O sistema deve gerar `Notificacao` em eventos relevantes da reserva
 
 ## Arquitetura
 
@@ -72,7 +72,7 @@ O projeto segue uma arquitetura em camadas com Spring Boot:
 - `controller`: recebe e responde requisicoes HTTP
 - `service`: aplica regras de negocio e coordenacao de casos de uso
 - `repository`: acesso aos dados com Spring Data JPA
-- `model`: entidades, enums e objetos de valor do dominio
+- `model`: entidades e objetos de valor do dominio
 - `dto`: contratos de entrada e saida da API
 - `exception`: tratamento padronizado de erros
 
@@ -91,11 +91,11 @@ src/main/java/com/classroomscheduler
 
 ## Endpoints planejados
 
-### Salas
+### Espacos
 
-- `GET /salas`
-- `GET /salas/disponiveis`
-- `POST /salas` (admin)
+- `GET /espacos`
+- `GET /espacos/disponiveis`
+- `POST /espacos` (admin)
 
 ### Reservas
 
@@ -103,10 +103,10 @@ src/main/java/com/classroomscheduler
 - `GET /reservas/minhas`
 - `PUT /reservas/{id}/cancelar`
 
-### Apoio administrativo
+### Notificacoes e apoio administrativo
 
-- `POST /salas/{id}/manutencoes`
-- `DELETE /salas/{id}/manutencoes/{manutencaoId}`
+- `GET /notificacoes`
+- `PATCH /espacos/{id}/indisponibilidade`
 
 Os detalhes de contratos e exemplos estao em [docs/endpoints.md](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/endpoints.md).
 
@@ -168,4 +168,4 @@ Como o banco esta em memoria, os dados sao perdidos ao encerrar a aplicacao.
 
 ## Observacao
 
-Esta documentacao descreve o dominio e a API planejados para o projeto `Classroom Scheduler`, mesmo que a implementacao atual ainda esteja em transicao a partir de um template anterior.
+Esta documentacao agora usa como base as classes obrigatorias do projeto e deve servir como guia direto para a implementacao do dominio.

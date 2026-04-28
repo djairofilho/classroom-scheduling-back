@@ -2,7 +2,7 @@
 
 ## Visao geral
 
-Os endpoints abaixo representam a API planejada para o `Classroom Scheduler`, organizada em torno dos casos de uso principais do sistema.
+Os endpoints abaixo representam a API planejada para o `Classroom Scheduler`, organizada em torno das classes obrigatorias do dominio.
 
 Base local:
 
@@ -10,46 +10,60 @@ Base local:
 http://localhost:8080
 ```
 
-## Salas
+## Espacos
 
-### `GET /salas`
+### `GET /espacos`
 
-Lista todas as salas cadastradas.
+Lista todos os espacos cadastrados.
 
 Uso principal:
 
-- consulta geral de salas
+- consulta geral de espacos
 - apoio para tela de listagem
 
-### `GET /salas/disponiveis`
+### `GET /espacos/disponiveis`
 
-Lista salas disponiveis para um intervalo e filtros informados.
+Lista espacos disponiveis para um intervalo e filtros informados.
 
 Parametros sugeridos:
 
 - `inicio`
 - `fim`
 - `capacidadeMinima`
-- `recurso`
+- `tipo`
+- `predioId`
 
 Exemplo:
 
 ```text
-GET /salas/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capacidadeMinima=30
+GET /espacos/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capacidadeMinima=30&tipo=AUDITORIO
 ```
 
-### `POST /salas`
+### `POST /espacos`
 
-Cria uma nova sala. Endpoint administrativo.
+Cria um novo espaco. Endpoint administrativo.
 
 Exemplo de body:
 
 ```json
 {
-  "nome": "Sala B201",
+  "nome": "Laboratorio C204",
+  "tipo": "LABORATORIO",
   "capacidade": 40,
-  "predioId": 1,
-  "recursoIds": [1, 2]
+  "predioId": 1
+}
+```
+
+### `PATCH /espacos/{id}/indisponibilidade`
+
+Marca ou remove indisponibilidade de um espaco. Endpoint administrativo.
+
+Exemplo de body:
+
+```json
+{
+  "indisponivel": true,
+  "motivo": "Manutencao preventiva"
 }
 ```
 
@@ -57,23 +71,23 @@ Exemplo de body:
 
 ### `POST /reservas`
 
-Cria uma reserva para um usuario e uma sala em um horario informado.
+Cria uma reserva para um `Solicitante` em um `Espaco` com um `Horarios` informado.
 
 Exemplo de body:
 
 ```json
 {
-  "usuarioId": 2,
-  "salaId": 5,
+  "solicitanteId": 2,
+  "espacoId": 5,
   "inicio": "2026-05-10T10:00:00",
   "fim": "2026-05-10T12:00:00",
-  "motivo": "Estudo em grupo"
+  "motivo": "Apresentacao de projeto"
 }
 ```
 
 ### `GET /reservas/minhas`
 
-Lista as reservas do usuario autenticado.
+Lista as reservas do solicitante autenticado.
 
 Uso principal:
 
@@ -86,8 +100,8 @@ Cancela uma reserva.
 
 Regras:
 
-- usuario comum cancela apenas a propria reserva
-- administrador pode cancelar qualquer reserva
+- `Solicitante` cancela apenas a propria reserva
+- `Admin` pode cancelar qualquer reserva
 
 Exemplo de path:
 
@@ -95,34 +109,34 @@ Exemplo de path:
 PUT /reservas/10/cancelar
 ```
 
-## Manutencao
+## Notificacoes
 
-### `POST /salas/{id}/manutencoes`
+### `GET /notificacoes`
 
-Cria um bloqueio de manutencao para a sala. Endpoint administrativo.
+Lista notificacoes do usuario autenticado.
+
+### `POST /notificacoes`
+
+Cria uma notificacao. Em geral este endpoint pode ser interno ou administrativo, dependendo da arquitetura adotada.
 
 Exemplo de body:
 
 ```json
 {
-  "inicio": "2026-05-11T08:00:00",
-  "fim": "2026-05-11T18:00:00",
-  "motivo": "Manutencao do projetor"
+  "usuarioId": 2,
+  "reservaId": 10,
+  "mensagem": "Sua reserva foi confirmada"
 }
 ```
 
-### `DELETE /salas/{id}/manutencoes/{manutencaoId}`
-
-Remove um bloqueio de manutencao da sala. Endpoint administrativo.
-
 ## Perfis de acesso
 
-- Usuario comum: consulta salas, consulta disponibilidade, cria reserva, cancela a propria reserva, lista suas reservas
-- Administrador: todas as operacoes de usuario comum, mais cadastro de salas e gestao de manutencao
+- `Solicitante`: consulta espacos, consulta disponibilidade, cria reserva, cancela a propria reserva, lista suas reservas e notificacoes
+- `Admin`: todas as operacoes de `Solicitante`, mais cadastro de espacos e controle de indisponibilidade
 
 ## Respostas esperadas
 
 - `200 OK`: consulta ou atualizacao realizada com sucesso
 - `201 Created`: recurso criado com sucesso
 - `400 Bad Request`: violacao de regra de negocio ou dados invalidos
-- `404 Not Found`: sala, usuario, reserva ou manutencao inexistente
+- `404 Not Found`: espaco, usuario, reserva, predio ou notificacao inexistente

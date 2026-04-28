@@ -2,73 +2,63 @@
 
 ## Objetivo
 
-As regras do `Classroom Scheduler` garantem que o sistema evite conflitos, respeite restricoes de uso e mantenha a reserva de salas previsivel e segura.
+As regras do `Classroom Scheduler` garantem que o sistema evite conflitos, respeite restricoes de uso e mantenha a reserva de espacos previsivel e segura.
 
 ## Regras obrigatorias
 
-- Nao permitir reserva de uma sala ja ocupada no mesmo intervalo
-- Nao permitir reserva de sala com manutencao ativa no horario solicitado
-- Nao permitir horario invalido, quando `fim` for anterior ou igual a `inicio`
+- Nao permitir reserva de um `Espaco` ja ocupado no mesmo intervalo
+- Nao permitir reserva de um `Espaco` marcado como indisponivel
+- Nao permitir `Horarios` invalido, quando `fim` for anterior ou igual a `inicio`
 - Nao permitir reserva em data ou horario passados
+- Toda alteracao relevante deve poder gerar uma `Notificacao`
 
 ## Regras por perfil de usuario
 
-### Aluno
+### `Solicitante`
 
-- Pode consultar salas e criar reservas
+- Pode consultar espacos e criar reservas
 - Pode cancelar apenas as proprias reservas
-- Possui limite maximo de duracao por reserva
+- Deve receber notificacoes sobre criacao, alteracao ou cancelamento das suas reservas
 
-### Professor
+### `Admin`
 
-- Pode consultar salas e criar reservas
-- Pode cancelar as proprias reservas
-- Possui maior flexibilidade de duracao, conforme politica definida
-
-### Administrador
-
-- Pode criar e atualizar salas
-- Pode associar recursos e capacidade
-- Pode bloquear salas para manutencao
+- Pode cadastrar e atualizar espacos
+- Pode associar espacos a um predio
+- Pode marcar indisponibilidade
 - Pode cancelar qualquer reserva
+- Pode consultar notificacoes administrativas quando houver
 
-## Papel da `PoliticaReserva`
+## Regras por estrutura do dominio
 
-A classe `PoliticaReserva` concentra as validacoes centrais para que as regras nao fiquem dispersas entre controller, service e entidades.
+### `Espaco`
 
-Exemplos de responsabilidades:
+- Todo espaco deve pertencer a um `Predio`
+- Todo espaco deve possuir tipo concreto: `Sala`, `Auditorio`, `Quadra` ou `Laboratorio`
+- A verificacao de disponibilidade deve considerar reservas existentes no mesmo intervalo
 
-- validar se o usuario pode reservar naquele contexto
-- validar duracao maxima para aluno
-- validar janelas de reserva permitidas
-- apoiar decisoes de cancelamento
+### `Reserva`
 
-Exemplo conceitual:
+- Deve estar ligada a um `Solicitante`
+- Deve apontar para exatamente um `Espaco`
+- Deve conter um objeto `Horarios` valido
 
-```java
-class PoliticaReserva {
+### `Notificacao`
 
-    boolean podeReservar(Usuario usuario, Horario horario) {
-        return true;
-    }
-
-    boolean validarDuracao(Usuario usuario, Horario horario) {
-        return true;
-    }
-}
-```
+- Pode ser emitida para confirmar criacao de reserva
+- Pode ser emitida para avisar cancelamento
+- Pode ser emitida para comunicar mudanca de disponibilidade do espaco
 
 ## Casos invalidos esperados
 
-- Tentativa de reservar uma sala ja reservada no mesmo periodo
-- Tentativa de reservar uma sala bloqueada por manutencao
+- Tentativa de reservar um espaco ja reservado no mesmo periodo
+- Tentativa de reservar um espaco indisponivel
 - Tentativa de reservar com intervalo de tempo inconsistente
 - Tentativa de reservar no passado
-- Tentativa de aluno exceder o limite de duracao
 - Tentativa de cancelar reserva de outro usuario sem permissao administrativa
 
 ## Comportamento esperado da aplicacao
 
 - Rejeitar requisicoes invalidas com erro de negocio claro
-- Preservar consistencia entre disponibilidade da sala e reservas confirmadas
-- Registrar o status da reserva para diferenciar reservas ativas e canceladas
+- Preservar consistencia entre disponibilidade do espaco e reservas confirmadas
+- Registrar a reserva e seus eventos de forma rastreavel
+- Manter notificacoes coerentes com as acoes relevantes do sistema
