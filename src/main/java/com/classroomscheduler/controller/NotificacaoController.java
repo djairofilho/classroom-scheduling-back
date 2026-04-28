@@ -1,5 +1,6 @@
 package com.classroomscheduler.controller;
 
+import com.classroomscheduler.dto.CreateNotificacaoRequest;
 import com.classroomscheduler.model.Notificacao;
 import com.classroomscheduler.service.NotificacaoService;
 import org.springframework.http.HttpStatus;
@@ -46,8 +47,8 @@ public class NotificacaoController {
     }
 
     @PostMapping
-    public ResponseEntity<Notificacao> criar(@RequestBody Notificacao notificacao) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(notificacaoService.salvar(notificacao));
+    public ResponseEntity<Notificacao> criar(@RequestBody CreateNotificacaoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(notificacaoService.salvar(request));
     }
 
     @PatchMapping("/{id}/lida")
