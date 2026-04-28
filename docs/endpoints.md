@@ -184,12 +184,8 @@ Exemplo de body:
 
 ```json
 {
-  "destinatario": {
-    "id": 2
-  },
-  "reserva": {
-    "id": 10
-  },
+  "destinatarioId": 2,
+  "reservaId": 10,
   "mensagem": "Sua reserva foi confirmada"
 }
 ```
