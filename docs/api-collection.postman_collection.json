@@ -98,7 +98,7 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/usuarios/buscar?email=admin@insper.edu.br",
+              "raw": "{{baseUrl}}/usuarios/buscar?email=admin@classroom.local",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -109,7 +109,7 @@
               "query": [
                 {
                   "key": "email",
-                  "value": "admin@insper.edu.br"
+                  "value": "admin@classroom.local"
                 }
               ]
             }
@@ -631,7 +631,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"destinatario\": {\n    \"id\": {{destinatarioId}}\n  },\n  \"reserva\": {\n    \"id\": {{reservaId}}\n  },\n  \"mensagem\": \"Sua reserva foi confirmada\"\n}"
+              "raw": "{\n  \"destinatarioId\": {{destinatarioId}},\n  \"reservaId\": {{reservaId}},\n  \"mensagem\": \"Sua reserva foi confirmada\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/notificacoes",
