@@ -55,6 +55,93 @@ Os principais elementos do dominio sao:
 - `Quadra`
 - `Laboratorio`
 
+## Diagrama de classes
+
+O modelo conceitual possui as classes do dominio, mas a persistencia em banco segue o mapeamento JPA atual. Como `Horarios` esta marcado com `@Embeddable`, ele nao vira tabela propria: os campos `inicio` e `fim` ficam na tabela `reserva`.
+
+```mermaid
+erDiagram
+    USUARIO {
+        bigint id PK
+        string nome
+        string email
+    }
+
+    ADMIN {
+        bigint id PK, FK
+    }
+
+    SOLICITANTE {
+        bigint id PK, FK
+    }
+
+    PREDIO {
+        bigint id PK
+        string nome
+        string codigo
+        string localizacao
+    }
+
+    ESPACO {
+        bigint id PK
+        string nome
+        int capacidade
+        boolean indisponivel
+        string motivo_indisponibilidade
+        bigint predio_id FK
+    }
+
+    SALA {
+        bigint id PK, FK
+    }
+
+    AUDITORIO {
+        bigint id PK, FK
+    }
+
+    QUADRA {
+        bigint id PK, FK
+    }
+
+    LABORATORIO {
+        bigint id PK, FK
+    }
+
+    RESERVA {
+        bigint id PK
+        bigint solicitante_id FK
+        bigint espaco_id FK
+        datetime inicio
+        datetime fim
+        string motivo
+        boolean cancelada
+        datetime criada_em
+    }
+
+    NOTIFICACAO {
+        bigint id PK
+        bigint destinatario_id FK
+        bigint reserva_id FK
+        string mensagem
+        boolean lida
+        datetime enviada_em
+    }
+
+    USUARIO ||--o| ADMIN : heranca
+    USUARIO ||--o| SOLICITANTE : heranca
+
+    ESPACO ||--o| SALA : heranca
+    ESPACO ||--o| AUDITORIO : heranca
+    ESPACO ||--o| QUADRA : heranca
+    ESPACO ||--o| LABORATORIO : heranca
+
+    PREDIO ||--o{ ESPACO : possui
+    SOLICITANTE ||--o{ RESERVA : cria
+    ESPACO ||--o{ RESERVA : recebe
+    USUARIO ||--o{ NOTIFICACAO : destinatario
+    RESERVA o|--o{ NOTIFICACAO : referencia
+```
+
 ## Regras de negocio centrais
 
 - Nao pode existir reserva em conflito de horario para o mesmo espaco
