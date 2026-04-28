@@ -41,7 +41,7 @@ GET /espacos/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capa
 
 ### `POST /espacos`
 
-Cria um novo espaco. Endpoint administrativo.
+Cria um novo espaco concreto. Endpoint administrativo e util para montar o fluxo completo de testes.
 
 Exemplo de body:
 
@@ -53,6 +53,13 @@ Exemplo de body:
   "predioId": 1
 }
 ```
+
+Tipos aceitos em `tipo`:
+
+- `SALA`
+- `AUDITORIO`
+- `QUADRA`
+- `LABORATORIO`
 
 ### `PATCH /espacos/{id}/indisponibilidade`
 
@@ -71,7 +78,7 @@ Exemplo de body:
 
 ### `POST /reservas`
 
-Cria uma reserva para um `Solicitante` em um `Espaco` com um `Horarios` informado.
+Cria uma reserva para um `Solicitante` em um `Espaco` usando um body simples com IDs e intervalo.
 
 Exemplo de body:
 
@@ -85,16 +92,25 @@ Exemplo de body:
 }
 ```
 
-### `GET /reservas/minhas`
+### `GET /reservas`
 
-Lista as reservas do solicitante autenticado.
+Lista todas as reservas cadastradas.
 
-Uso principal:
+### `GET /reservas/ativas`
 
-- consulta de reservas ativas
-- historico de reservas
+Lista apenas as reservas nao canceladas.
 
-### `PUT /reservas/{id}/cancelar`
+### `GET /reservas/por-solicitante`
+
+Lista as reservas de um solicitante pelo `solicitanteId`.
+
+Exemplo:
+
+```text
+GET /reservas/por-solicitante?solicitanteId=2
+```
+
+### `PATCH /reservas/{id}/cancelar`
 
 Cancela uma reserva.
 
@@ -109,11 +125,56 @@ Exemplo de path:
 PUT /reservas/10/cancelar
 ```
 
+## Solicitantes
+
+### `GET /solicitantes`
+
+Lista os solicitantes cadastrados.
+
+### `GET /solicitantes/{id}`
+
+Busca um solicitante por identificador.
+
+### `GET /solicitantes/buscar`
+
+Busca um solicitante por email.
+
+Exemplo:
+
+```text
+GET /solicitantes/buscar?email=aluno@insper.edu.br
+```
+
+### `POST /solicitantes`
+
+Cria um solicitante para uso no fluxo de reserva.
+
+Exemplo de body:
+
+```json
+{
+  "nome": "Maria Souza",
+  "email": "maria@insper.edu.br"
+}
+```
+
+## Admin padrao
+
+O `Admin` nao possui endpoint de criacao publica neste ajuste. A aplicacao cria um administrador padrao ao subir, usando variaveis de ambiente:
+
+- `APP_ADMIN_NOME`
+- `APP_ADMIN_EMAIL`
+
+Valores default quando nao configurados:
+
+- nome: `Administrador Padrao`
+- email: `admin@classroom.local`
+
 ## Notificacoes
 
 ### `GET /notificacoes`
 
-Lista notificacoes do usuario autenticado.
+Lista todas as notificacoes.
 
 ### `POST /notificacoes`
 
@@ -123,16 +184,24 @@ Exemplo de body:
 
 ```json
 {
-  "usuarioId": 2,
-  "reservaId": 10,
+  "destinatario": {
+    "id": 2
+  },
+  "reserva": {
+    "id": 10
+  },
   "mensagem": "Sua reserva foi confirmada"
 }
 ```
 
+### `PATCH /notificacoes/{id}/lida`
+
+Marca uma notificacao como lida.
+
 ## Perfis de acesso
 
-- `Solicitante`: consulta espacos, consulta disponibilidade, cria reserva, cancela a propria reserva, lista suas reservas e notificacoes
-- `Admin`: todas as operacoes de `Solicitante`, mais cadastro de espacos e controle de indisponibilidade
+- `Solicitante`: criado via API para testar reservas, consultar espacos, criar reserva, listar reservas e consultar notificacoes
+- `Admin`: bootstrapado por ambiente, sem criacao publica via API, e reservado para acoes administrativas
 
 ## Respostas esperadas
 

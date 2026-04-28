@@ -10,11 +10,19 @@
       "value": "http://localhost:8080"
     },
     {
-      "key": "salaId",
+      "key": "usuarioId",
       "value": "1"
     },
     {
-      "key": "usuarioId",
+      "key": "predioId",
+      "value": "1"
+    },
+    {
+      "key": "espacoId",
+      "value": "1"
+    },
+    {
+      "key": "solicitanteId",
       "value": "1"
     },
     {
@@ -22,61 +30,167 @@
       "value": "1"
     },
     {
-      "key": "manutencaoId",
+      "key": "destinatarioId",
+      "value": "1"
+    },
+    {
+      "key": "notificacaoId",
       "value": "1"
     }
   ],
   "item": [
     {
-      "name": "Salas",
+      "name": "Health",
       "item": [
         {
-          "name": "Listar salas",
+          "name": "Health Check",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/salas",
+              "raw": "{{baseUrl}}/health",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "salas"
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
               ]
             }
           }
         },
         {
-          "name": "Listar salas disponiveis",
+          "name": "Buscar usuario por id",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/salas/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capacidadeMinima=30",
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "salas",
-                "disponiveis"
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar usuario por email",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/buscar?email=admin@insper.edu.br",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "buscar"
               ],
               "query": [
                 {
-                  "key": "inicio",
-                  "value": "2026-05-10T10:00:00"
-                },
-                {
-                  "key": "fim",
-                  "value": "2026-05-10T12:00:00"
-                },
-                {
-                  "key": "capacidadeMinima",
-                  "value": "30"
+                  "key": "email",
+                  "value": "admin@insper.edu.br"
                 }
               ]
             }
           }
         },
         {
-          "name": "Criar sala",
+          "name": "Remover usuario",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Solicitantes",
+      "item": [
+        {
+          "name": "Listar solicitantes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/solicitantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitantes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar solicitante por id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/solicitantes/{{solicitanteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitantes",
+                "{{solicitanteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar solicitante por email",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/solicitantes/buscar?email=aluno@insper.edu.br",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "solicitantes",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "aluno@insper.edu.br"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar solicitante",
           "request": {
             "method": "POST",
             "header": [
@@ -87,15 +201,224 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Sala B201\",\n  \"capacidade\": 40,\n  \"predioId\": 1,\n  \"recursoIds\": [1, 2]\n}"
+              "raw": "{\n  \"nome\": \"Maria Souza\",\n  \"email\": \"maria@insper.edu.br\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/salas",
+              "raw": "{{baseUrl}}/solicitantes",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "salas"
+                "solicitantes"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predios",
+      "item": [
+        {
+          "name": "Listar predios",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/predios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "predios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar predio por id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/predios/{{predioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "predios",
+                "{{predioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar predio por codigo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/predios/buscar?codigo=A",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "predios",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "codigo",
+                  "value": "A"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar predio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Predio A\",\n  \"codigo\": \"A\",\n  \"localizacao\": \"Campus principal\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/predios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "predios"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Espacos",
+      "item": [
+        {
+          "name": "Listar espacos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/espacos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar espaco",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sala B201\",\n  \"tipo\": \"SALA\",\n  \"capacidade\": 40,\n  \"predioId\": {{predioId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/espacos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar espaco por id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/espacos/{{espacoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos",
+                "{{espacoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar espacos disponiveis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/espacos/disponiveis",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos",
+                "disponiveis"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar espacos por predio",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/espacos/por-predio?predioId={{predioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos",
+                "por-predio"
+              ],
+              "query": [
+                {
+                  "key": "predioId",
+                  "value": "{{predioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Atualizar indisponibilidade do espaco",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"indisponivel\": true,\n  \"motivo\": \"Manutencao preventiva\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/espacos/{{espacoId}}/indisponibilidade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos",
+                "{{espacoId}}",
+                "indisponibilidade"
               ]
             }
           }
@@ -105,6 +428,75 @@
     {
       "name": "Reservas",
       "item": [
+        {
+          "name": "Listar reservas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reservas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar reserva por id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reservas/{{reservaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{reservaId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar reservas ativas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reservas/ativas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "ativas"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar reservas por solicitante",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reservas/por-solicitante?solicitanteId={{solicitanteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "por-solicitante"
+              ],
+              "query": [
+                {
+                  "key": "solicitanteId",
+                  "value": "{{solicitanteId}}"
+                }
+              ]
+            }
+          }
+        },
         {
           "name": "Criar reserva",
           "request": {
@@ -117,7 +509,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"usuarioId\": {{usuarioId}},\n  \"salaId\": {{salaId}},\n  \"inicio\": \"2026-05-10T10:00:00\",\n  \"fim\": \"2026-05-10T12:00:00\",\n  \"motivo\": \"Estudo em grupo\"\n}"
+              "raw": "{\n  \"solicitanteId\": {{solicitanteId}},\n  \"espacoId\": {{espacoId}},\n  \"inicio\": \"2026-05-10T10:00:00\",\n  \"fim\": \"2026-05-10T12:00:00\",\n  \"motivo\": \"Apresentacao de projeto\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/reservas",
@@ -131,25 +523,9 @@
           }
         },
         {
-          "name": "Listar minhas reservas",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/reservas/minhas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reservas",
-                "minhas"
-              ]
-            }
-          }
-        },
-        {
           "name": "Cancelar reserva",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "url": {
               "raw": "{{baseUrl}}/reservas/{{reservaId}}/cancelar",
               "host": [
@@ -166,10 +542,85 @@
       ]
     },
     {
-      "name": "Manutencoes",
+      "name": "Notificacoes",
       "item": [
         {
-          "name": "Criar manutencao",
+          "name": "Listar notificacoes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notificacoes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificacoes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar notificacao por id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notificacoes/{{notificacaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificacoes",
+                "{{notificacaoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar notificacoes por destinatario",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notificacoes/por-destinatario?destinatarioId={{destinatarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificacoes",
+                "por-destinatario"
+              ],
+              "query": [
+                {
+                  "key": "destinatarioId",
+                  "value": "{{destinatarioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar notificacoes nao lidas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/notificacoes/nao-lidas?destinatarioId={{destinatarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notificacoes",
+                "nao-lidas"
+              ],
+              "query": [
+                {
+                  "key": "destinatarioId",
+                  "value": "{{destinatarioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar notificacao",
           "request": {
             "method": "POST",
             "header": [
@@ -180,35 +631,32 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"inicio\": \"2026-05-11T08:00:00\",\n  \"fim\": \"2026-05-11T18:00:00\",\n  \"motivo\": \"Manutencao do projetor\"\n}"
+              "raw": "{\n  \"destinatario\": {\n    \"id\": {{destinatarioId}}\n  },\n  \"reserva\": {\n    \"id\": {{reservaId}}\n  },\n  \"mensagem\": \"Sua reserva foi confirmada\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/salas/{{salaId}}/manutencoes",
+              "raw": "{{baseUrl}}/notificacoes",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "salas",
-                "{{salaId}}",
-                "manutencoes"
+                "notificacoes"
               ]
             }
           }
         },
         {
-          "name": "Remover manutencao",
+          "name": "Marcar notificacao como lida",
           "request": {
-            "method": "DELETE",
+            "method": "PATCH",
             "url": {
-              "raw": "{{baseUrl}}/salas/{{salaId}}/manutencoes/{{manutencaoId}}",
+              "raw": "{{baseUrl}}/notificacoes/{{notificacaoId}}/lida",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "salas",
-                "{{salaId}}",
-                "manutencoes",
-                "{{manutencaoId}}"
+                "notificacoes",
+                "{{notificacaoId}}",
+                "lida"
               ]
             }
           }

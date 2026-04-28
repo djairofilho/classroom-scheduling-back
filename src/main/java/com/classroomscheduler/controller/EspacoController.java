@@ -1,11 +1,14 @@
 package com.classroomscheduler.controller;
 
+import com.classroomscheduler.dto.CreateEspacoRequest;
 import com.classroomscheduler.model.Espaco;
 import com.classroomscheduler.service.EspacoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +45,11 @@ public class EspacoController {
     @GetMapping("/por-predio")
     public ResponseEntity<List<Espaco>> listarPorPredio(@RequestParam Long predioId) {
         return ResponseEntity.ok(espacoService.listarPorPredio(predioId));
+    }
+
+    @PostMapping
+    public ResponseEntity<Espaco> criar(@RequestBody CreateEspacoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(espacoService.criar(request));
     }
 
     @PatchMapping("/{id}/indisponibilidade")
