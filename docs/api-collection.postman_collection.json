@@ -318,6 +318,31 @@
           }
         },
         {
+          "name": "Criar espaco",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sala B201\",\n  \"tipo\": \"SALA\",\n  \"capacidade\": 40,\n  \"predioId\": {{predioId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/espacos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "espacos"
+              ]
+            }
+          }
+        },
+        {
           "name": "Buscar espaco por id",
           "request": {
             "method": "GET",
