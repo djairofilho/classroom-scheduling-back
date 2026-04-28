@@ -1,5 +1,6 @@
 package com.classroomscheduler.controller;
 
+import com.classroomscheduler.dto.CreateReservaRequest;
 import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.service.ReservaService;
 import org.springframework.http.HttpStatus;
@@ -46,8 +47,8 @@ public class ReservaController {
     }
 
     @PostMapping
-    public ResponseEntity<Reserva> criar(@RequestBody Reserva reserva) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.criar(reserva));
+    public ResponseEntity<Reserva> criar(@RequestBody CreateReservaRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.criar(request));
     }
 
     @PatchMapping("/{id}/cancelar")
