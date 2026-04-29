@@ -253,6 +253,7 @@ Como o banco esta em memoria, os dados sao perdidos ao encerrar a aplicacao.
 - [Endpoints da API](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/endpoints.md)
 - [Collection Postman](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/api-collection.postman_collection.json)
 - [Backlog do produto](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/backlog-do-produto.md)
+- [Padrao de commits e PRs](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/padrao-de-commits-e-prs.md)
 
 ## Observacao
 
