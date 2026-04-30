@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
@@ -18,5 +19,17 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             Long espacoId,
             LocalDateTime fim,
             LocalDateTime inicio
+    );
+
+    boolean existsBySolicitanteIdAndEspacoIdAndMotivo(
+            Long solicitanteId,
+            Long espacoId,
+            String motivo
+    );
+
+    Optional<Reserva> findFirstBySolicitanteIdAndEspacoIdAndMotivo(
+            Long solicitanteId,
+            Long espacoId,
+            String motivo
     );
 }
