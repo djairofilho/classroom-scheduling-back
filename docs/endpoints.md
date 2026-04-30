@@ -2,59 +2,129 @@
 
 ## Visao geral
 
-Os endpoints abaixo representam a API planejada para o `Classroom Scheduler`, organizada em torno das classes obrigatorias do dominio.
-
 Base local:
 
 ```text
 http://localhost:8080
 ```
 
-## Espacos
+Contrato OpenAPI exportado:
 
-### `GET /espacos`
+- [OpenAPI JSON](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/openapi.json)
 
-Lista todos os espacos cadastrados.
+## Health
 
-Uso principal:
+### `GET /health`
 
-- consulta geral de espacos
-- apoio para tela de listagem
+Retorna o status basico da aplicacao.
 
-### `GET /espacos/disponiveis`
+## Usuarios
 
-Lista espacos disponiveis para um intervalo e filtros informados.
+### `GET /usuarios`
 
-Parametros sugeridos:
+Lista todos os usuarios.
 
-- `inicio`
-- `fim`
-- `capacidadeMinima`
-- `tipo`
-- `predioId`
+### `GET /usuarios/{id}`
 
-Exemplo:
+Busca um usuario por id.
 
-```text
-GET /espacos/disponiveis?inicio=2026-05-10T10:00:00&fim=2026-05-10T12:00:00&capacidadeMinima=30&tipo=AUDITORIO
-```
+### `GET /usuarios/buscar?email=...`
 
-### `POST /espacos`
+Busca um usuario por email.
 
-Cria um novo espaco concreto. Endpoint administrativo e util para montar o fluxo completo de testes.
+### `DELETE /usuarios/{id}`
+
+Remove um usuario por id.
+
+## Solicitantes
+
+### `GET /solicitantes`
+
+Lista todos os solicitantes.
+
+### `GET /solicitantes/{id}`
+
+Busca um solicitante por id.
+
+### `GET /solicitantes/buscar?email=...`
+
+Busca um solicitante por email.
+
+### `POST /solicitantes`
+
+Cria um solicitante.
 
 Exemplo de body:
 
 ```json
 {
-  "nome": "Laboratorio C204",
-  "tipo": "LABORATORIO",
+  "nome": "Maria Souza",
+  "email": "maria@insper.edu.br"
+}
+```
+
+## Predios
+
+### `GET /predios`
+
+Lista todos os predios.
+
+### `GET /predios/{id}`
+
+Busca um predio por id.
+
+### `GET /predios/buscar?codigo=...`
+
+Busca um predio por codigo.
+
+### `POST /predios`
+
+Cria um predio.
+
+Exemplo de body:
+
+```json
+{
+  "nome": "Predio A",
+  "codigo": "A",
+  "localizacao": "Campus principal"
+}
+```
+
+## Espacos
+
+### `GET /espacos`
+
+Lista todos os espacos.
+
+### `GET /espacos/{id}`
+
+Busca um espaco por id.
+
+### `GET /espacos/disponiveis`
+
+Lista espacos com `indisponivel = false`.
+
+### `GET /espacos/por-predio?predioId=...`
+
+Lista os espacos vinculados a um predio.
+
+### `POST /espacos`
+
+Cria um espaco concreto.
+
+Exemplo de body:
+
+```json
+{
+  "nome": "Sala B201",
+  "tipo": "SALA",
   "capacidade": 40,
   "predioId": 1
 }
 ```
 
-Tipos aceitos em `tipo`:
+Tipos aceitos:
 
 - `SALA`
 - `AUDITORIO`
@@ -63,7 +133,7 @@ Tipos aceitos em `tipo`:
 
 ### `PATCH /espacos/{id}/indisponibilidade`
 
-Marca ou remove indisponibilidade de um espaco. Endpoint administrativo.
+Marca ou remove indisponibilidade de um espaco.
 
 Exemplo de body:
 
@@ -76,99 +146,41 @@ Exemplo de body:
 
 ## Reservas
 
+### `GET /reservas`
+
+Lista todas as reservas.
+
+### `GET /reservas/{id}`
+
+Busca uma reserva por id.
+
+### `GET /reservas/ativas`
+
+Lista reservas nao canceladas.
+
+### `GET /reservas/por-solicitante?solicitanteId=...`
+
+Lista reservas de um solicitante.
+
 ### `POST /reservas`
 
-Cria uma reserva para um `Solicitante` em um `Espaco` usando um body simples com IDs e intervalo.
+Cria uma reserva.
 
 Exemplo de body:
 
 ```json
 {
   "solicitanteId": 2,
-  "espacoId": 5,
-  "inicio": "2026-05-10T10:00:00",
-  "fim": "2026-05-10T12:00:00",
+  "espacoId": 1,
+  "inicio": "2030-05-10T10:00:00",
+  "fim": "2030-05-10T12:00:00",
   "motivo": "Apresentacao de projeto"
 }
-```
-
-### `GET /reservas`
-
-Lista todas as reservas cadastradas.
-
-### `GET /reservas/ativas`
-
-Lista apenas as reservas nao canceladas.
-
-### `GET /reservas/por-solicitante`
-
-Lista as reservas de um solicitante pelo `solicitanteId`.
-
-Exemplo:
-
-```text
-GET /reservas/por-solicitante?solicitanteId=2
 ```
 
 ### `PATCH /reservas/{id}/cancelar`
 
 Cancela uma reserva.
-
-Regras:
-
-- `Solicitante` cancela apenas a propria reserva
-- `Admin` pode cancelar qualquer reserva
-
-Exemplo de path:
-
-```text
-PUT /reservas/10/cancelar
-```
-
-## Solicitantes
-
-### `GET /solicitantes`
-
-Lista os solicitantes cadastrados.
-
-### `GET /solicitantes/{id}`
-
-Busca um solicitante por identificador.
-
-### `GET /solicitantes/buscar`
-
-Busca um solicitante por email.
-
-Exemplo:
-
-```text
-GET /solicitantes/buscar?email=aluno@insper.edu.br
-```
-
-### `POST /solicitantes`
-
-Cria um solicitante para uso no fluxo de reserva.
-
-Exemplo de body:
-
-```json
-{
-  "nome": "Maria Souza",
-  "email": "maria@insper.edu.br"
-}
-```
-
-## Admin padrao
-
-O `Admin` nao possui endpoint de criacao publica neste ajuste. A aplicacao cria um administrador padrao ao subir, usando variaveis de ambiente:
-
-- `APP_ADMIN_NOME`
-- `APP_ADMIN_EMAIL`
-
-Valores default quando nao configurados:
-
-- nome: `Administrador Padrao`
-- email: `admin@classroom.local`
 
 ## Notificacoes
 
@@ -176,9 +188,21 @@ Valores default quando nao configurados:
 
 Lista todas as notificacoes.
 
+### `GET /notificacoes/{id}`
+
+Busca uma notificacao por id.
+
+### `GET /notificacoes/por-destinatario?destinatarioId=...`
+
+Lista notificacoes de um destinatario.
+
+### `GET /notificacoes/nao-lidas?destinatarioId=...`
+
+Lista notificacoes nao lidas de um destinatario.
+
 ### `POST /notificacoes`
 
-Cria uma notificacao. Em geral este endpoint pode ser interno ou administrativo, dependendo da arquitetura adotada.
+Cria uma notificacao usando referencias por objeto.
 
 Exemplo de body:
 
@@ -188,7 +212,7 @@ Exemplo de body:
     "id": 2
   },
   "reserva": {
-    "id": 10
+    "id": 1
   },
   "mensagem": "Sua reserva foi confirmada"
 }
@@ -198,14 +222,20 @@ Exemplo de body:
 
 Marca uma notificacao como lida.
 
-## Perfis de acesso
+## Seed local
 
-- `Solicitante`: criado via API para testar reservas, consultar espacos, criar reserva, listar reservas e consultar notificacoes
-- `Admin`: bootstrapado por ambiente, sem criacao publica via API, e reservado para acoes administrativas
+Com a seed local habilitada, a aplicacao sobe com dados basicos para demonstracao:
+
+- `usuarioId = 1` para o admin padrao
+- `predioId = 1` e `predioId = 2`
+- `espacoId = 1` para `Sala 101`
+- `solicitanteId = 2` para `Ana Souza`
+- `destinatarioId = 2` para notificacoes da Ana
+- `reservaId = 1` para a reserva de exemplo
 
 ## Respostas esperadas
 
-- `200 OK`: consulta ou atualizacao realizada com sucesso
-- `201 Created`: recurso criado com sucesso
-- `400 Bad Request`: violacao de regra de negocio ou dados invalidos
-- `404 Not Found`: espaco, usuario, reserva, predio ou notificacao inexistente
+- `200 OK` para consultas e atualizacoes
+- `201 Created` para criacao de recursos
+- `400 Bad Request` para dados invalidos ou violacao de regra
+- `404 Not Found` para recurso inexistente

@@ -176,24 +176,33 @@ src/main/java/com/classroomscheduler
 `-- ApiApplication.java
 ```
 
-## Endpoints planejados
+## Endpoints atuais
 
 ### Espacos
 
 - `GET /espacos`
 - `GET /espacos/disponiveis`
-- `POST /espacos` (admin)
+- `GET /espacos/por-predio?predioId=...`
+- `POST /espacos`
+- `PATCH /espacos/{id}/indisponibilidade`
 
 ### Reservas
 
 - `POST /reservas`
-- `GET /reservas/minhas`
-- `PUT /reservas/{id}/cancelar`
+- `GET /reservas`
+- `GET /reservas/{id}`
+- `GET /reservas/ativas`
+- `GET /reservas/por-solicitante?solicitanteId=...`
+- `PATCH /reservas/{id}/cancelar`
 
-### Notificacoes e apoio administrativo
+### Solicitantes, usuarios e notificacoes
 
+- `GET /solicitantes`
+- `POST /solicitantes`
+- `GET /usuarios`
 - `GET /notificacoes`
-- `PATCH /espacos/{id}/indisponibilidade`
+- `POST /notificacoes`
+- `PATCH /notificacoes/{id}/lida`
 
 Os detalhes de contratos e exemplos estao em [docs/endpoints.md](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/endpoints.md).
 
@@ -208,6 +217,22 @@ Pre-requisitos:
 Executar a aplicacao:
 
 ```powershell
+.\mvnw spring-boot:run
+```
+
+Por padrao, a aplicacao sobe com uma seed local de demonstracao habilitada. Ela cria:
+
+- um `Admin` padrao
+- dois `Predios`
+- quatro `Espacos`
+- dois `Solicitantes`
+- uma `Reserva` futura de exemplo
+- `Notificacoes` iniciais para explorar a API
+
+Para desligar a seed local, defina:
+
+```powershell
+$env:APP_DEMO_DATA_ENABLED='false'
 .\mvnw spring-boot:run
 ```
 
@@ -251,6 +276,7 @@ Como o banco esta em memoria, os dados sao perdidos ao encerrar a aplicacao.
 - [Modelagem de dominio](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/modelagem-de-dominio.md)
 - [Regras de negocio](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/regras-de-negocio.md)
 - [Endpoints da API](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/endpoints.md)
+- [Contrato OpenAPI](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/openapi.json)
 - [Collection Postman](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/api-collection.postman_collection.json)
 - [Backlog do produto](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/backlog-do-produto.md)
 - [Padrao de commits e PRs](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/padrao-de-commits-e-prs.md)

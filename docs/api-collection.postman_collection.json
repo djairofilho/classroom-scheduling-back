@@ -23,7 +23,7 @@
     },
     {
       "key": "solicitanteId",
-      "value": "1"
+      "value": "2"
     },
     {
       "key": "reservaId",
@@ -31,7 +31,7 @@
     },
     {
       "key": "destinatarioId",
-      "value": "1"
+      "value": "2"
     },
     {
       "key": "notificacaoId",
@@ -98,7 +98,7 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/usuarios/buscar?email=admin@insper.edu.br",
+              "raw": "{{baseUrl}}/usuarios/buscar?email=admin@classroom.local",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -109,7 +109,7 @@
               "query": [
                 {
                   "key": "email",
-                  "value": "admin@insper.edu.br"
+                  "value": "admin@classroom.local"
                 }
               ]
             }
@@ -172,7 +172,7 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/solicitantes/buscar?email=aluno@insper.edu.br",
+              "raw": "{{baseUrl}}/solicitantes/buscar?email=ana.souza@classroom.local",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -183,7 +183,7 @@
               "query": [
                 {
                   "key": "email",
-                  "value": "aluno@insper.edu.br"
+                  "value": "ana.souza@classroom.local"
                 }
               ]
             }
@@ -255,7 +255,7 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/predios/buscar?codigo=A",
+              "raw": "{{baseUrl}}/predios/buscar?codigo=BL-A",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -266,7 +266,7 @@
               "query": [
                 {
                   "key": "codigo",
-                  "value": "A"
+                  "value": "BL-A"
                 }
               ]
             }
@@ -284,7 +284,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Predio A\",\n  \"codigo\": \"A\",\n  \"localizacao\": \"Campus principal\"\n}"
+              "raw": "{\n  \"nome\": \"Predio C\",\n  \"codigo\": \"C\",\n  \"localizacao\": \"Bloco complementar\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/predios",
@@ -509,7 +509,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"solicitanteId\": {{solicitanteId}},\n  \"espacoId\": {{espacoId}},\n  \"inicio\": \"2026-05-10T10:00:00\",\n  \"fim\": \"2026-05-10T12:00:00\",\n  \"motivo\": \"Apresentacao de projeto\"\n}"
+              "raw": "{\n  \"solicitanteId\": {{solicitanteId}},\n  \"espacoId\": {{espacoId}},\n  \"inicio\": \"2030-05-10T10:00:00\",\n  \"fim\": \"2030-05-10T12:00:00\",\n  \"motivo\": \"Apresentacao de projeto\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/reservas",

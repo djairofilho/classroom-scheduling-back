@@ -10,4 +10,6 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, Long> 
     List<Notificacao> findByDestinatarioId(Long destinatarioId);
 
     List<Notificacao> findByDestinatarioIdAndLidaFalse(Long destinatarioId);
+
+    boolean existsByDestinatarioIdAndMensagem(Long destinatarioId, String mensagem);
 }

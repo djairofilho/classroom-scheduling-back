@@ -1,0 +1,1097 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/solicitantes": {
+      "get": {
+        "tags": [
+          "solicitante-controller"
+        ],
+        "operationId": "listarTodos",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Solicitante"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "solicitante-controller"
+        ],
+        "operationId": "criar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSolicitanteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Solicitante"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservas": {
+      "get": {
+        "tags": [
+          "reserva-controller"
+        ],
+        "operationId": "listarTodas",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reserva"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "reserva-controller"
+        ],
+        "operationId": "criar_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reserva"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predios": {
+      "get": {
+        "tags": [
+          "predio-controller"
+        ],
+        "operationId": "listarTodos_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Predio"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "predio-controller"
+        ],
+        "operationId": "criar_2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Predio"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Predio"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notificacoes": {
+      "get": {
+        "tags": [
+          "notificacao-controller"
+        ],
+        "operationId": "listarTodas_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Notificacao"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "notificacao-controller"
+        ],
+        "operationId": "criar_3",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Notificacao"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notificacao"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/espacos": {
+      "get": {
+        "tags": [
+          "espaco-controller"
+        ],
+        "operationId": "listarTodos_2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Espaco"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "espaco-controller"
+        ],
+        "operationId": "criar_4",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEspacoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Espaco"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservas/{id}/cancelar": {
+      "patch": {
+        "tags": [
+          "reserva-controller"
+        ],
+        "operationId": "cancelar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reserva"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notificacoes/{id}/lida": {
+      "patch": {
+        "tags": [
+          "notificacao-controller"
+        ],
+        "operationId": "marcarComoLida",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notificacao"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/espacos/{id}/indisponibilidade": {
+      "patch": {
+        "tags": [
+          "espaco-controller"
+        ],
+        "operationId": "atualizarIndisponibilidade",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {}
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Espaco"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "get": {
+        "tags": [
+          "usuario-controller"
+        ],
+        "operationId": "listarTodos_3",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Usuario"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "tags": [
+          "usuario-controller"
+        ],
+        "operationId": "buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "usuario-controller"
+        ],
+        "operationId": "remover",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/usuarios/buscar": {
+      "get": {
+        "tags": [
+          "usuario-controller"
+        ],
+        "operationId": "buscarPorEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/solicitantes/{id}": {
+      "get": {
+        "tags": [
+          "solicitante-controller"
+        ],
+        "operationId": "buscarPorId_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Solicitante"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/solicitantes/buscar": {
+      "get": {
+        "tags": [
+          "solicitante-controller"
+        ],
+        "operationId": "buscarPorEmail_1",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Solicitante"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservas/{id}": {
+      "get": {
+        "tags": [
+          "reserva-controller"
+        ],
+        "operationId": "buscarPorId_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reserva"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservas/por-solicitante": {
+      "get": {
+        "tags": [
+          "reserva-controller"
+        ],
+        "operationId": "listarPorSolicitante",
+        "parameters": [
+          {
+            "name": "solicitanteId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reserva"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservas/ativas": {
+      "get": {
+        "tags": [
+          "reserva-controller"
+        ],
+        "operationId": "listarAtivas",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reserva"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predios/{id}": {
+      "get": {
+        "tags": [
+          "predio-controller"
+        ],
+        "operationId": "buscarPorId_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Predio"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predios/buscar": {
+      "get": {
+        "tags": [
+          "predio-controller"
+        ],
+        "operationId": "buscarPorCodigo",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Predio"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notificacoes/{id}": {
+      "get": {
+        "tags": [
+          "notificacao-controller"
+        ],
+        "operationId": "buscarPorId_4",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notificacao"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notificacoes/por-destinatario": {
+      "get": {
+        "tags": [
+          "notificacao-controller"
+        ],
+        "operationId": "listarPorDestinatario",
+        "parameters": [
+          {
+            "name": "destinatarioId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Notificacao"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notificacoes/nao-lidas": {
+      "get": {
+        "tags": [
+          "notificacao-controller"
+        ],
+        "operationId": "listarNaoLidas",
+        "parameters": [
+          {
+            "name": "destinatarioId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Notificacao"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "health-controller"
+        ],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/espacos/{id}": {
+      "get": {
+        "tags": [
+          "espaco-controller"
+        ],
+        "operationId": "buscarPorId_5",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Espaco"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/espacos/por-predio": {
+      "get": {
+        "tags": [
+          "espaco-controller"
+        ],
+        "operationId": "listarPorPredio",
+        "parameters": [
+          {
+            "name": "predioId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Espaco"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/espacos/disponiveis": {
+      "get": {
+        "tags": [
+          "espaco-controller"
+        ],
+        "operationId": "listarDisponiveis",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Espaco"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateSolicitanteRequest": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "Solicitante": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateReservaRequest": {
+        "type": "object",
+        "properties": {
+          "solicitanteId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "espacoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "inicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fim": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "motivo": {
+            "type": "string"
+          }
+        }
+      },
+      "Espaco": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "capacidade": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "indisponivel": {
+            "type": "boolean"
+          },
+          "motivoIndisponibilidade": {
+            "type": "string"
+          },
+          "predio": {
+            "$ref": "#/components/schemas/Predio"
+          }
+        }
+      },
+      "Horarios": {
+        "type": "object",
+        "properties": {
+          "inicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fim": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Predio": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "codigo": {
+            "type": "string"
+          },
+          "localizacao": {
+            "type": "string"
+          }
+        }
+      },
+      "Reserva": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "solicitante": {
+            "$ref": "#/components/schemas/Solicitante"
+          },
+          "espaco": {
+            "$ref": "#/components/schemas/Espaco"
+          },
+          "horarios": {
+            "$ref": "#/components/schemas/Horarios"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "cancelada": {
+            "type": "boolean"
+          },
+          "criadaEm": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Notificacao": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "destinatario": {
+            "$ref": "#/components/schemas/Usuario"
+          },
+          "reserva": {
+            "$ref": "#/components/schemas/Reserva"
+          },
+          "mensagem": {
+            "type": "string"
+          },
+          "lida": {
+            "type": "boolean"
+          },
+          "enviadaEm": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateEspacoRequest": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string"
+          },
+          "capacidade": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "predioId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      }
+    }
+  }
+}
