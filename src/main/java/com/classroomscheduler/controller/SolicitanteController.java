@@ -1,7 +1,7 @@
 package com.classroomscheduler.controller;
 
 import com.classroomscheduler.dto.CreateSolicitanteRequest;
-import com.classroomscheduler.model.Solicitante;
+import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.service.SolicitanteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,22 +26,22 @@ public class SolicitanteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Solicitante>> listarTodos() {
+    public ResponseEntity<List<Usuario>> listarTodos() {
         return ResponseEntity.ok(solicitanteService.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Solicitante> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(solicitanteService.buscarPorId(id));
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<Solicitante> buscarPorEmail(@RequestParam String email) {
+    public ResponseEntity<Usuario> buscarPorEmail(@RequestParam String email) {
         return ResponseEntity.ok(solicitanteService.buscarPorEmail(email));
     }
 
     @PostMapping
-    public ResponseEntity<Solicitante> criar(@RequestBody CreateSolicitanteRequest request) {
+    public ResponseEntity<Usuario> criar(@RequestBody CreateSolicitanteRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(solicitanteService.criar(request));
     }
 }

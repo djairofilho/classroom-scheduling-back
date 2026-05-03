@@ -4,9 +4,9 @@ import com.classroomscheduler.dto.CreateSolicitanteRequest;
 import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.PapelUsuario;
-import com.classroomscheduler.model.Solicitante;
 import com.classroomscheduler.model.TipoSolicitante;
-import com.classroomscheduler.repository.SolicitanteRepository;
+import com.classroomscheduler.model.Usuario;
+import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,27 +15,28 @@ import java.util.Locale;
 @Service
 public class SolicitanteService {
 
-    private final SolicitanteRepository solicitanteRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public SolicitanteService(SolicitanteRepository solicitanteRepository) {
-        this.solicitanteRepository = solicitanteRepository;
+    public SolicitanteService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Solicitante> listarTodos() {
-        return solicitanteRepository.findAll();
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findByPapel(PapelUsuario.SOLICITANTE);
     }
 
-    public Solicitante buscarPorId(Long id) {
-        return solicitanteRepository.findById(id)
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .filter(usuario -> usuario.getPapel() == PapelUsuario.SOLICITANTE)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado."));
     }
 
-    public Solicitante buscarPorEmail(String email) {
-        return solicitanteRepository.findByEmail(email)
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmailAndPapel(email.trim().toLowerCase(Locale.ROOT), PapelUsuario.SOLICITANTE)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado."));
     }
 
-    public Solicitante criar(CreateSolicitanteRequest request) {
+    public Usuario criar(CreateSolicitanteRequest request) {
         if (request.getNome() == null || request.getNome().isBlank()) {
             throw new RegraDeNegocioException("Solicitante deve possuir nome.");
         }
@@ -46,16 +47,16 @@ public class SolicitanteService {
 
         String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
 
-        if (solicitanteRepository.findByEmail(email).isPresent()) {
+        if (usuarioRepository.findByEmail(email).isPresent()) {
             throw new RegraDeNegocioException("Ja existe solicitante com esse email.");
         }
 
-        Solicitante solicitante = new Solicitante();
+        Usuario solicitante = new Usuario();
         solicitante.setNome(request.getNome());
         solicitante.setEmail(email);
         solicitante.setPapel(PapelUsuario.SOLICITANTE);
         solicitante.setTipoSolicitante(inferirTipoSolicitante(email));
-        return solicitanteRepository.save(solicitante);
+        return usuarioRepository.save(solicitante);
     }
 
     private TipoSolicitante inferirTipoSolicitante(String email) {
