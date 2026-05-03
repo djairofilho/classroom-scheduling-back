@@ -1,6 +1,10 @@
 package com.classroomscheduler.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,7 +21,17 @@ public abstract class Usuario {
 
     private String nome;
 
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @JsonIgnore
+    private String senhaHash;
+
+    @Enumerated(EnumType.STRING)
+    private PapelUsuario papel;
+
+    @Enumerated(EnumType.STRING)
+    private TipoSolicitante tipoSolicitante;
 
     public Usuario() {
     }
@@ -44,5 +58,29 @@ public abstract class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSenhaHash() {
+        return senhaHash;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        this.senhaHash = senhaHash;
+    }
+
+    public PapelUsuario getPapel() {
+        return papel;
+    }
+
+    public void setPapel(PapelUsuario papel) {
+        this.papel = papel;
+    }
+
+    public TipoSolicitante getTipoSolicitante() {
+        return tipoSolicitante;
+    }
+
+    public void setTipoSolicitante(TipoSolicitante tipoSolicitante) {
+        this.tipoSolicitante = tipoSolicitante;
     }
 }

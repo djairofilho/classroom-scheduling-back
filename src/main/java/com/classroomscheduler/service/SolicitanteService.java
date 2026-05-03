@@ -1,11 +1,14 @@
 package com.classroomscheduler.service;
 
 import com.classroomscheduler.dto.CreateSolicitanteRequest;
+import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Solicitante;
+import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.repository.SolicitanteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @Service
@@ -40,13 +43,29 @@ public class SolicitanteService {
             throw new IllegalArgumentException("Solicitante deve possuir email.");
         }
 
-        if (solicitanteRepository.findByEmail(request.getEmail()).isPresent()) {
+        String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
+
+        if (solicitanteRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Ja existe solicitante com esse email.");
         }
 
         Solicitante solicitante = new Solicitante();
         solicitante.setNome(request.getNome());
-        solicitante.setEmail(request.getEmail());
+        solicitante.setEmail(email);
+        solicitante.setPapel(PapelUsuario.SOLICITANTE);
+        solicitante.setTipoSolicitante(inferirTipoSolicitante(email));
         return solicitanteRepository.save(solicitante);
+    }
+
+    private TipoSolicitante inferirTipoSolicitante(String email) {
+        if (email.endsWith("@al.insper.edu.br")) {
+            return TipoSolicitante.ALUNO;
+        }
+
+        if (email.endsWith("@insper.edu.br")) {
+            return TipoSolicitante.FUNCIONARIO;
+        }
+
+        throw new IllegalArgumentException("Email deve ser institucional do Insper.");
     }
 }
