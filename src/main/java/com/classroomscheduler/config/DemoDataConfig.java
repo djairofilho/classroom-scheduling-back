@@ -1,25 +1,26 @@
 package com.classroomscheduler.config;
 
-import com.classroomscheduler.model.Admin;
-import com.classroomscheduler.model.Auditorio;
+import com.classroomscheduler.model.DiaSemana;
 import com.classroomscheduler.model.Espaco;
-import com.classroomscheduler.model.Horarios;
-import com.classroomscheduler.model.Laboratorio;
+import com.classroomscheduler.model.HorarioFuncionamento;
+import com.classroomscheduler.model.HorarioReserva;
 import com.classroomscheduler.model.Notificacao;
 import com.classroomscheduler.model.PapelUsuario;
+import com.classroomscheduler.model.PoliticaReserva;
 import com.classroomscheduler.model.Predio;
-import com.classroomscheduler.model.Quadra;
+import com.classroomscheduler.model.RecursoEspaco;
 import com.classroomscheduler.model.Reserva;
-import com.classroomscheduler.model.Sala;
-import com.classroomscheduler.model.Solicitante;
+import com.classroomscheduler.model.TipoEspaco;
 import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.model.Usuario;
-import com.classroomscheduler.repository.AdminRepository;
 import com.classroomscheduler.repository.EspacoRepository;
+import com.classroomscheduler.repository.HorarioFuncionamentoRepository;
 import com.classroomscheduler.repository.NotificacaoRepository;
+import com.classroomscheduler.repository.PoliticaReservaRepository;
 import com.classroomscheduler.repository.PredioRepository;
+import com.classroomscheduler.repository.RecursoEspacoRepository;
 import com.classroomscheduler.repository.ReservaRepository;
-import com.classroomscheduler.repository.SolicitanteRepository;
+import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Locale;
 
 @Configuration
@@ -36,10 +39,12 @@ public class DemoDataConfig {
     public CommandLineRunner demoDataRunner(
             PredioRepository predioRepository,
             EspacoRepository espacoRepository,
-            AdminRepository adminRepository,
-            SolicitanteRepository solicitanteRepository,
+            UsuarioRepository usuarioRepository,
             ReservaRepository reservaRepository,
             NotificacaoRepository notificacaoRepository,
+            HorarioFuncionamentoRepository horarioFuncionamentoRepository,
+            RecursoEspacoRepository recursoEspacoRepository,
+            PoliticaReservaRepository politicaReservaRepository,
             PasswordEncoder passwordEncoder,
             @Value("${APP_ADMIN_NOME:Administrador Padrao}") String adminNome,
             @Value("${APP_ADMIN_EMAIL:admin@insper.edu.br}") String adminEmail,
@@ -65,58 +70,88 @@ public class DemoDataConfig {
                     "Rua do Campus, 200"
             );
 
+            garantirHorariosPredio(horarioFuncionamentoRepository, predioA);
+            garantirHorariosPredio(horarioFuncionamentoRepository, predioB);
+
+            RecursoEspaco projetor = buscarOuCriarRecurso(
+                    recursoEspacoRepository,
+                    "Projetor",
+                    "Projetor multimidia instalado no espaco."
+            );
+            RecursoEspaco quadro = buscarOuCriarRecurso(
+                    recursoEspacoRepository,
+                    "Quadro branco",
+                    "Quadro branco para aulas e reunioes."
+            );
+            RecursoEspaco som = buscarOuCriarRecurso(
+                    recursoEspacoRepository,
+                    "Sistema de som",
+                    "Microfones e caixas de som para eventos."
+            );
+
+            buscarOuCriarPoliticaReserva(politicaReservaRepository);
+
             Espaco sala101 = buscarOuCriarEspaco(
                     espacoRepository,
                     predioA,
                     "Sala 101",
+                    TipoEspaco.SALA,
                     40,
-                    new Sala(),
                     false,
-                    null
+                    null,
+                    projetor,
+                    quadro
             );
 
             buscarOuCriarEspaco(
                     espacoRepository,
                     predioA,
                     "Laboratorio Makers",
+                    TipoEspaco.LABORATORIO,
                     25,
-                    new Laboratorio(),
                     false,
-                    null
+                    null,
+                    projetor,
+                    quadro
             );
 
             Espaco auditorioPrincipal = buscarOuCriarEspaco(
                     espacoRepository,
                     predioB,
                     "Auditorio Principal",
+                    TipoEspaco.AUDITORIO,
                     120,
-                    new Auditorio(),
                     false,
-                    null
+                    null,
+                    projetor,
+                    som
             );
 
             buscarOuCriarEspaco(
                     espacoRepository,
                     predioB,
                     "Quadra Coberta",
+                    TipoEspaco.QUADRA,
                     60,
-                    new Quadra(),
                     true,
                     "Indisponivel para manutencao preventiva"
             );
 
-            Solicitante ana = buscarOuCriarSolicitante(
-                    solicitanteRepository,
+            garantirHorariosEspaco(horarioFuncionamentoRepository, sala101);
+            garantirHorariosEspaco(horarioFuncionamentoRepository, auditorioPrincipal);
+
+            Usuario ana = buscarOuCriarSolicitante(
+                    usuarioRepository,
                     "ana.souza@al.insper.edu.br"
             );
 
-            Solicitante bruno = buscarOuCriarSolicitante(
-                    solicitanteRepository,
+            Usuario bruno = buscarOuCriarSolicitante(
+                    usuarioRepository,
                     "bruno.lima@insper.edu.br"
             );
 
-            Admin admin = buscarOuCriarAdmin(
-                    adminRepository,
+            Usuario admin = buscarOuCriarAdmin(
+                    usuarioRepository,
                     passwordEncoder,
                     adminNome,
                     adminEmail,
@@ -176,41 +211,151 @@ public class DemoDataConfig {
                 });
     }
 
-    private Solicitante buscarOuCriarSolicitante(
-            SolicitanteRepository solicitanteRepository,
-            String email
+    private void garantirHorariosPredio(
+            HorarioFuncionamentoRepository horarioFuncionamentoRepository,
+            Predio predio
     ) {
-        return solicitanteRepository.findByEmail(email)
+        for (DiaSemana diaSemana : DiaSemana.values()) {
+            LocalTime abertura = diaSemana == DiaSemana.DOMINGO ? LocalTime.of(10, 0) : LocalTime.of(7, 0);
+            LocalTime fechamento = diaSemana == DiaSemana.DOMINGO ? LocalTime.of(16, 0) : LocalTime.of(22, 0);
+            garantirHorarioPredio(horarioFuncionamentoRepository, predio, diaSemana, abertura, fechamento);
+        }
+    }
+
+    private void garantirHorarioPredio(
+            HorarioFuncionamentoRepository horarioFuncionamentoRepository,
+            Predio predio,
+            DiaSemana diaSemana,
+            LocalTime abertura,
+            LocalTime fechamento
+    ) {
+        boolean existe = horarioFuncionamentoRepository.findByPredioId(predio.getId()).stream()
+                .anyMatch(horario -> horario.getDiaSemana() == diaSemana && horario.getEspaco() == null);
+
+        if (existe) {
+            return;
+        }
+
+        HorarioFuncionamento horario = new HorarioFuncionamento();
+        horario.setPredio(predio);
+        horario.setDiaSemana(diaSemana);
+        horario.setAbertura(abertura);
+        horario.setFechamento(fechamento);
+        horario.setAtivo(true);
+        horarioFuncionamentoRepository.save(horario);
+    }
+
+    private void garantirHorariosEspaco(
+            HorarioFuncionamentoRepository horarioFuncionamentoRepository,
+            Espaco espaco
+    ) {
+        List<DiaSemana> diasUteis = List.of(
+                DiaSemana.SEGUNDA,
+                DiaSemana.TERCA,
+                DiaSemana.QUARTA,
+                DiaSemana.QUINTA,
+                DiaSemana.SEXTA
+        );
+
+        for (DiaSemana diaSemana : diasUteis) {
+            garantirHorarioEspaco(
+                    horarioFuncionamentoRepository,
+                    espaco,
+                    diaSemana,
+                    LocalTime.of(8, 0),
+                    LocalTime.of(20, 0)
+            );
+        }
+    }
+
+    private void garantirHorarioEspaco(
+            HorarioFuncionamentoRepository horarioFuncionamentoRepository,
+            Espaco espaco,
+            DiaSemana diaSemana,
+            LocalTime abertura,
+            LocalTime fechamento
+    ) {
+        boolean existe = horarioFuncionamentoRepository.findByEspacoId(espaco.getId()).stream()
+                .anyMatch(horario -> horario.getDiaSemana() == diaSemana);
+
+        if (existe) {
+            return;
+        }
+
+        HorarioFuncionamento horario = new HorarioFuncionamento();
+        horario.setEspaco(espaco);
+        horario.setDiaSemana(diaSemana);
+        horario.setAbertura(abertura);
+        horario.setFechamento(fechamento);
+        horario.setAtivo(true);
+        horarioFuncionamentoRepository.save(horario);
+    }
+
+    private RecursoEspaco buscarOuCriarRecurso(
+            RecursoEspacoRepository recursoEspacoRepository,
+            String nome,
+            String descricao
+    ) {
+        return recursoEspacoRepository.findByNomeIgnoreCase(nome)
                 .orElseGet(() -> {
-                    Solicitante solicitante = new Solicitante();
-                    solicitante.setNome(email);
-                    solicitante.setEmail(email);
-                    solicitante.setPapel(PapelUsuario.SOLICITANTE);
-                    solicitante.setTipoSolicitante(
-                            email.endsWith("@al.insper.edu.br")
-                                    ? TipoSolicitante.ALUNO
-                                    : TipoSolicitante.FUNCIONARIO
-                    );
-                    return solicitanteRepository.save(solicitante);
+                    RecursoEspaco recurso = new RecursoEspaco();
+                    recurso.setNome(nome);
+                    recurso.setDescricao(descricao);
+                    return recursoEspacoRepository.save(recurso);
                 });
     }
 
-    private Admin buscarOuCriarAdmin(
-            AdminRepository adminRepository,
+    private PoliticaReserva buscarOuCriarPoliticaReserva(
+            PoliticaReservaRepository politicaReservaRepository
+    ) {
+        return politicaReservaRepository.findByNomeIgnoreCase("Padrao")
+                .orElseGet(() -> {
+                    PoliticaReserva politica = new PoliticaReserva();
+                    politica.setNome("Padrao");
+                    politica.setAntecedenciaMinimaHoras(1);
+                    politica.setDuracaoMaximaHoras(4);
+                    politica.setPermiteFimDeSemana(true);
+                    politica.setRequerAprovacaoAdmin(false);
+                    return politicaReservaRepository.save(politica);
+                });
+    }
+
+    private Usuario buscarOuCriarSolicitante(
+            UsuarioRepository usuarioRepository,
+            String email
+    ) {
+        String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
+        return usuarioRepository.findByEmail(emailNormalizado)
+                .orElseGet(() -> {
+                    Usuario solicitante = new Usuario();
+                    solicitante.setNome(emailNormalizado);
+                    solicitante.setEmail(emailNormalizado);
+                    solicitante.setPapel(PapelUsuario.SOLICITANTE);
+                    solicitante.setTipoSolicitante(
+                            emailNormalizado.endsWith("@al.insper.edu.br")
+                                    ? TipoSolicitante.ALUNO
+                                    : TipoSolicitante.FUNCIONARIO
+                    );
+                    return usuarioRepository.save(solicitante);
+                });
+    }
+
+    private Usuario buscarOuCriarAdmin(
+            UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             String nome,
             String email,
             String senha
     ) {
         String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
-        return adminRepository.findByEmail(emailNormalizado)
+        return usuarioRepository.findByEmail(emailNormalizado)
                 .orElseGet(() -> {
-                    Admin admin = new Admin();
+                    Usuario admin = new Usuario();
                     admin.setNome(nome);
                     admin.setEmail(emailNormalizado);
                     admin.setPapel(PapelUsuario.ADMIN);
                     admin.setSenhaHash(passwordEncoder.encode(senha));
-                    return adminRepository.save(admin);
+                    return usuarioRepository.save(admin);
                 });
     }
 
@@ -218,19 +363,23 @@ public class DemoDataConfig {
             EspacoRepository espacoRepository,
             Predio predio,
             String nome,
+            TipoEspaco tipo,
             Integer capacidade,
-            Espaco novoEspaco,
             boolean indisponivel,
-            String motivoIndisponibilidade
+            String motivoIndisponibilidade,
+            RecursoEspaco... recursos
     ) {
         return espacoRepository.findByPredioIdAndNomeIgnoreCase(predio.getId(), nome)
                 .orElseGet(() -> {
-                    novoEspaco.setNome(nome);
-                    novoEspaco.setCapacidade(capacidade);
-                    novoEspaco.setPredio(predio);
-                    novoEspaco.setIndisponivel(indisponivel);
-                    novoEspaco.setMotivoIndisponibilidade(motivoIndisponibilidade);
-                    return espacoRepository.save(novoEspaco);
+                    Espaco espaco = new Espaco();
+                    espaco.setNome(nome);
+                    espaco.setTipo(tipo);
+                    espaco.setCapacidade(capacidade);
+                    espaco.setPredio(predio);
+                    espaco.setIndisponivel(indisponivel);
+                    espaco.setMotivoIndisponibilidade(motivoIndisponibilidade);
+                    espaco.getRecursos().addAll(List.of(recursos));
+                    return espacoRepository.save(espaco);
                 });
     }
 
@@ -254,7 +403,7 @@ public class DemoDataConfig {
             ).orElseThrow();
         }
 
-        Horarios horarios = new Horarios();
+        HorarioReserva horarios = new HorarioReserva();
         LocalDateTime inicio = LocalDateTime.now()
                 .plusDays(1)
                 .withHour(10)
