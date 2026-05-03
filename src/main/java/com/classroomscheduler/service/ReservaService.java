@@ -3,9 +3,9 @@ package com.classroomscheduler.service;
 import com.classroomscheduler.dto.CreateReservaRequest;
 import com.classroomscheduler.model.Horarios;
 import com.classroomscheduler.model.Reserva;
-import com.classroomscheduler.model.Solicitante;
+import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.ReservaRepository;
-import com.classroomscheduler.repository.SolicitanteRepository;
+import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,16 +16,16 @@ import java.util.NoSuchElementException;
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
-    private final SolicitanteRepository solicitanteRepository;
+    private final UsuarioRepository usuarioRepository;
     private final EspacoService espacoService;
 
     public ReservaService(
             ReservaRepository reservaRepository,
-            SolicitanteRepository solicitanteRepository,
+            UsuarioRepository usuarioRepository,
             EspacoService espacoService
     ) {
         this.reservaRepository = reservaRepository;
-        this.solicitanteRepository = solicitanteRepository;
+        this.usuarioRepository = usuarioRepository;
         this.espacoService = espacoService;
     }
 
@@ -59,8 +59,8 @@ public class ReservaService {
             throw new IllegalArgumentException("Reserva deve possuir horarios.");
         }
 
-        Solicitante solicitante = solicitanteRepository.findById(request.getSolicitanteId())
-                .orElseThrow(() -> new NoSuchElementException("Solicitante nao encontrado."));
+        Usuario solicitante = usuarioRepository.findById(request.getSolicitanteId())
+                .orElseThrow(() -> new NoSuchElementException("Usuario solicitante nao encontrado."));
 
         LocalDateTime inicio = request.getInicio();
         LocalDateTime fim = request.getFim();

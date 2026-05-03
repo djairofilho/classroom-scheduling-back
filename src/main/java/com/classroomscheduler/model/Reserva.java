@@ -22,7 +22,7 @@ public class Reserva {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "solicitante_id", nullable = false)
-    private Solicitante solicitante;
+    private Usuario solicitante;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "espaco_id", nullable = false)
@@ -69,11 +69,11 @@ public class Reserva {
         this.id = id;
     }
 
-    public Solicitante getSolicitante() {
+    public Usuario getSolicitante() {
         return solicitante;
     }
 
-    public void setSolicitante(Solicitante solicitante) {
+    public void setSolicitante(Usuario solicitante) {
         this.solicitante = solicitante;
     }
 
