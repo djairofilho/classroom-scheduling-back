@@ -1,11 +1,11 @@
 package com.classroomscheduler.service;
 
+import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.model.Notificacao;
 import com.classroomscheduler.repository.NotificacaoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class NotificacaoService {
@@ -30,7 +30,7 @@ public class NotificacaoService {
 
     public Notificacao buscarPorId(Long id) {
         return notificacaoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Notificacao nao encontrada."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Notificacao nao encontrada."));
     }
 
     public Notificacao salvar(Notificacao notificacao) {
