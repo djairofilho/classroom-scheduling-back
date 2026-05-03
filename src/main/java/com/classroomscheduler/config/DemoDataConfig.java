@@ -5,11 +5,13 @@ import com.classroomscheduler.model.Espaco;
 import com.classroomscheduler.model.Horarios;
 import com.classroomscheduler.model.Laboratorio;
 import com.classroomscheduler.model.Notificacao;
+import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Predio;
 import com.classroomscheduler.model.Quadra;
 import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.model.Sala;
 import com.classroomscheduler.model.Solicitante;
+import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.repository.EspacoRepository;
 import com.classroomscheduler.repository.NotificacaoRepository;
 import com.classroomscheduler.repository.PredioRepository;
@@ -95,14 +97,12 @@ public class DemoDataConfig {
 
             Solicitante ana = buscarOuCriarSolicitante(
                     solicitanteRepository,
-                    "Ana Souza",
-                    "ana.souza@classroom.local"
+                    "ana.souza@al.insper.edu.br"
             );
 
             Solicitante bruno = buscarOuCriarSolicitante(
                     solicitanteRepository,
-                    "Bruno Lima",
-                    "bruno.lima@classroom.local"
+                    "bruno.lima@insper.edu.br"
             );
 
             Reserva reservaDemo = buscarOuCriarReserva(
@@ -146,14 +146,19 @@ public class DemoDataConfig {
 
     private Solicitante buscarOuCriarSolicitante(
             SolicitanteRepository solicitanteRepository,
-            String nome,
             String email
     ) {
         return solicitanteRepository.findByEmail(email)
                 .orElseGet(() -> {
                     Solicitante solicitante = new Solicitante();
-                    solicitante.setNome(nome);
+                    solicitante.setNome(email);
                     solicitante.setEmail(email);
+                    solicitante.setPapel(PapelUsuario.SOLICITANTE);
+                    solicitante.setTipoSolicitante(
+                            email.endsWith("@al.insper.edu.br")
+                                    ? TipoSolicitante.ALUNO
+                                    : TipoSolicitante.FUNCIONARIO
+                    );
                     return solicitanteRepository.save(solicitante);
                 });
     }
