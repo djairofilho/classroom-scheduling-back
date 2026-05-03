@@ -30,7 +30,7 @@ public class Reserva {
     private Espaco espaco;
 
     @Embedded
-    private Horarios horarios;
+    private HorarioReserva horarios;
 
     private String motivo;
 
@@ -86,11 +86,11 @@ public class Reserva {
         this.espaco = espaco;
     }
 
-    public Horarios getHorarios() {
+    public HorarioReserva getHorarios() {
         return horarios;
     }
 
-    public void setHorarios(Horarios horarios) {
+    public void setHorarios(HorarioReserva horarios) {
         this.horarios = horarios;
     }
 
