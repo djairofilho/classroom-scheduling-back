@@ -8,7 +8,7 @@ As regras do `Classroom Scheduler` garantem que o sistema evite conflitos, respe
 
 - Nao permitir reserva de um `Espaco` ja ocupado no mesmo intervalo
 - Nao permitir reserva de um `Espaco` marcado como indisponivel
-- Nao permitir `Horarios` invalido, quando `fim` for anterior ou igual a `inicio`
+- Nao permitir `HorarioReserva` invalido, quando `fim` for anterior ou igual a `inicio`
 - Nao permitir reserva em data ou horario passados
 - Toda alteracao relevante deve poder gerar uma `Notificacao`
 
@@ -16,11 +16,15 @@ As regras do `Classroom Scheduler` garantem que o sistema evite conflitos, respe
 
 ### `Solicitante`
 
+No codigo, solicitante e um `Usuario` com `papel = SOLICITANTE`.
+
 - Pode consultar espacos e criar reservas
 - Pode cancelar apenas as proprias reservas
 - Deve receber notificacoes sobre criacao, alteracao ou cancelamento das suas reservas
 
 ### `Admin`
+
+No codigo, admin e um `Usuario` com `papel = ADMIN`.
 
 - Pode cadastrar e atualizar espacos
 - Pode associar espacos a um predio
@@ -33,14 +37,26 @@ As regras do `Classroom Scheduler` garantem que o sistema evite conflitos, respe
 ### `Espaco`
 
 - Todo espaco deve pertencer a um `Predio`
-- Todo espaco deve possuir tipo concreto: `Sala`, `Auditorio`, `Quadra` ou `Laboratorio`
+- Todo espaco deve possuir `tipo`: `SALA`, `AUDITORIO`, `QUADRA` ou `LABORATORIO`
 - A verificacao de disponibilidade deve considerar reservas existentes no mesmo intervalo
+- Janelas especificas do espaco podem ser representadas por `HorarioFuncionamento`
+- Bloqueios planejados devem ser representados por `Indisponibilidade`
 
 ### `Reserva`
 
-- Deve estar ligada a um `Solicitante`
+- Deve estar ligada a um `Usuario`
 - Deve apontar para exatamente um `Espaco`
-- Deve conter um objeto `Horarios` valido
+- Deve conter um objeto `HorarioReserva` valido
+
+### `Predio`
+
+- Pode possuir horarios de funcionamento por dia da semana
+- Seus horarios servem como referencia para os espacos vinculados
+
+### `PoliticaReserva`
+
+- Deve centralizar limites de antecedencia, duracao e necessidade de aprovacao
+- Deve evoluir como fonte de configuracao de regras de reserva
 
 ### `Notificacao`
 
