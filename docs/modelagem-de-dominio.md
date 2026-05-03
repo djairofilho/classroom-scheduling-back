@@ -2,145 +2,204 @@
 
 ## Visao geral
 
-O `Classroom Scheduler` foi modelado para resolver o agendamento de espacos com um conjunto obrigatorio de classes que deve guiar a implementacao do projeto. O foco esta em representar corretamente usuarios, espacos, reservas, horarios e notificacoes.
+O `Classroom Scheduler` foi modelado para resolver agendamento de espacos com 10 classes de dominio que carregam responsabilidades reais. A decisao atual evita subclasses vazias: `Admin` e `Solicitante` sao papeis de `Usuario`, enquanto `Sala`, `Auditorio`, `Quadra` e `Laboratorio` sao tipos de `Espaco`.
 
-## Classes obrigatorias
+Enums de apoio:
 
-### Usuarios
+- `PapelUsuario`: `ADMIN` ou `SOLICITANTE`
+- `TipoSolicitante`: `ALUNO` ou `FUNCIONARIO`
+- `TipoEspaco`: `SALA`, `AUDITORIO`, `QUADRA` ou `LABORATORIO`
+- `DiaSemana`: dias usados em horario de funcionamento
 
-- `Usuario`: classe base com dados comuns de identificacao, autenticacao e contato
-- `Admin`: especializacao de `Usuario` com poderes de gestao global
-- `Solicitante`: especializacao de `Usuario` responsavel por criar e acompanhar reservas
-
-### Estrutura fisica
-
-- `Predio`: representa o bloco ou edificio ao qual os espacos pertencem
-- `Espaco`: classe base para qualquer recurso fisico reservavel
-- `Sala`: especializacao de `Espaco` para aulas e reunioes
-- `Auditorio`: especializacao de `Espaco` para eventos e apresentacoes
-- `Quadra`: especializacao de `Espaco` para atividades esportivas
-- `Laboratorio`: especializacao de `Espaco` para aulas praticas e atividades com equipamentos
-
-### Agendamento
-
-- `Reserva`: entidade principal de agendamento
-- `Horarios`: classe que encapsula `inicio` e `fim`, validando intervalo e conflito
-
-### Comunicacao
-
-- `Notificacao`: representa avisos emitidos pelo sistema sobre criacao, alteracao ou cancelamento de reservas
-
-## Relacoes principais
-
-- `Admin` e `Solicitante` herdam de `Usuario`
-- `Sala`, `Auditorio`, `Quadra` e `Laboratorio` herdam de `Espaco`
-- `Espaco` pertence a um `Predio`
-- `Reserva` associa um `Solicitante` a um `Espaco`
-- `Reserva` contem um `Horarios`
-- `Notificacao` referencia um `Usuario` destinatario e pode estar associada a uma `Reserva`
-
-## Responsabilidades por elemento
+## As 10 classes de dominio
 
 ### `Usuario`
 
-- Manter dados comuns como nome, email e identificacao
-- Servir de base para permissao e rastreabilidade das acoes
+Representa qualquer pessoa autenticada no sistema.
 
-### `Admin`
-
-- Gerenciar espacos
-- Intervir em reservas quando necessario
-- Acompanhar operacoes administrativas do sistema
-
-### `Solicitante`
-
-- Solicitar reservas
-- Cancelar as proprias reservas
-- Consultar historico e notificacoes
+- Mantem `nome`, `email`, `senhaHash`, `papel` e `tipoSolicitante`
+- Define permissao por `papel`, sem precisar de classe `Admin` ou `Solicitante`
+- Para solicitantes, o tipo e inferido pelo dominio do email institucional
 
 ### `Predio`
 
-- Organizar a distribuicao fisica dos espacos
-- Permitir filtros por localizacao
+Representa o bloco ou edificio fisico.
+
+- Agrupa espacos por localizacao
+- Possui horarios de funcionamento proprios
+- Permite filtros e organizacao operacional
 
 ### `Espaco`
 
-- Centralizar atributos comuns, como nome, capacidade e disponibilidade
-- Servir como abstracao principal para o modulo de reservas
+Representa qualquer recurso fisico reservavel.
 
-### `Sala`, `Auditorio`, `Quadra`, `Laboratorio`
+- Usa `tipo` para identificar sala, auditorio, quadra ou laboratorio
+- Mantem capacidade, disponibilidade e motivo de indisponibilidade
+- Pertence a um predio
+- Pode possuir recursos, horarios especificos e indisponibilidades
 
-- Especializar `Espaco` conforme o tipo de uso
-- Permitir regras ou atributos especificos por categoria no futuro
+### `HorarioFuncionamento`
+
+Representa dias e janelas de abertura.
+
+- Pode estar ligado a um predio ou a um espaco
+- Usa `DiaSemana`, `abertura`, `fechamento` e `ativo`
+- Permite diferenciar funcionamento geral do predio e excecoes por espaco
 
 ### `Reserva`
 
-- Representar a reserva realizada por um solicitante
-- Manter status, motivo e vinculo com o espaco reservado
-- Permitir cancelamento conforme regra de negocio
+Representa o agendamento feito por um usuario.
 
-### `Horarios`
+- Liga `Usuario` e `Espaco`
+- Guarda motivo, cancelamento e data de criacao
+- Compoe `HorarioReserva` para validar inicio/fim
 
-- Garantir que o intervalo seja valido
-- Detectar conflitos com outro horario
-- Encapsular a logica temporal sem espalhar comparacoes pela aplicacao
+### `HorarioReserva`
+
+Objeto embutido em `Reserva`.
+
+- Encapsula `inicio` e `fim`
+- Valida que `fim` e posterior ao `inicio`
+- Oferece logica de conflito temporal
+
+### `Indisponibilidade`
+
+Representa bloqueios planejados de um espaco.
+
+- Guarda intervalo, motivo e usuario que criou o bloqueio
+- E adequada para manutencao, eventos internos ou restricoes temporarias
+- Complementa o booleano operacional `indisponivel` de `Espaco`
+
+### `RecursoEspaco`
+
+Representa equipamentos ou facilidades disponiveis no espaco.
+
+- Exemplos: projetor, quadro branco, sistema de som
+- Relaciona-se com varios espacos
+- Permite filtros futuros por infraestrutura
 
 ### `Notificacao`
 
-- Informar eventos relevantes ao usuario
-- Registrar leitura, data de envio e conteudo da mensagem
+Representa avisos emitidos aos usuarios.
 
-## Decisoes de design que fortalecem o projeto
+- Guarda destinatario, reserva opcional, mensagem, leitura e envio
+- E usada para eventos de reserva e avisos operacionais
 
-- Uso de heranca em `Usuario` para separar papeis sem duplicar atributos comuns
-- Uso de heranca em `Espaco` para permitir varios tipos de ambiente com a mesma regra central de reserva
-- Uso de `Horarios` como objeto de valor do dominio
-- Uso de `Notificacao` como parte explicita do modelo, e nao apenas detalhe tecnico de infraestrutura
+### `PoliticaReserva`
 
-## Exemplo conceitual
+Representa parametros de regra de reserva.
 
-```java
-abstract class Usuario {
-    Long id;
-    String nome;
-    String email;
-}
+- Define antecedencia minima
+- Define duracao maxima
+- Indica se fim de semana e permitido
+- Indica se aprovacao administrativa e exigida
 
-class Admin extends Usuario { }
+## Relacoes principais
 
-class Solicitante extends Usuario { }
+- `Predio` possui muitos `Espaco`
+- `Predio` pode possuir varios `HorarioFuncionamento`
+- `Espaco` pode possuir horarios especificos, indisponibilidades e recursos
+- `Usuario` cria reservas e recebe notificacoes
+- `Reserva` associa um usuario a um espaco e contem um `HorarioReserva`
+- `Notificacao` referencia um usuario destinatario e pode referenciar uma reserva
 
-abstract class Espaco {
-    Long id;
-    String nome;
-    int capacidade;
-    Predio predio;
-}
+## Diagrama conceitual
 
-class Sala extends Espaco { }
-class Auditorio extends Espaco { }
-class Quadra extends Espaco { }
-class Laboratorio extends Espaco { }
+```mermaid
+classDiagram
+    class Usuario {
+        Long id
+        String nome
+        String email
+        String senhaHash
+        PapelUsuario papel
+        TipoSolicitante tipoSolicitante
+    }
 
-class Reserva {
-    Long id;
-    Solicitante solicitante;
-    Espaco espaco;
-    Horarios horarios;
-    String motivo;
-}
+    class Predio {
+        Long id
+        String nome
+        String codigo
+        String localizacao
+    }
 
-class Horarios {
-    LocalDateTime inicio;
-    LocalDateTime fim;
+    class Espaco {
+        Long id
+        String nome
+        TipoEspaco tipo
+        Integer capacidade
+        boolean indisponivel
+        String motivoIndisponibilidade
+    }
 
-    boolean conflita(Horarios outro) { return false; }
-}
+    class HorarioFuncionamento {
+        Long id
+        DiaSemana diaSemana
+        LocalTime abertura
+        LocalTime fechamento
+        boolean ativo
+    }
 
-class Notificacao {
-    Long id;
-    Usuario destinatario;
-    Reserva reserva;
-    String mensagem;
-}
+    class Reserva {
+        Long id
+        String motivo
+        boolean cancelada
+        LocalDateTime criadaEm
+    }
+
+    class HorarioReserva {
+        LocalDateTime inicio
+        LocalDateTime fim
+        validar()
+        conflita()
+    }
+
+    class Indisponibilidade {
+        Long id
+        LocalDateTime inicio
+        LocalDateTime fim
+        String motivo
+    }
+
+    class RecursoEspaco {
+        Long id
+        String nome
+        String descricao
+    }
+
+    class Notificacao {
+        Long id
+        String mensagem
+        boolean lida
+        LocalDateTime enviadaEm
+    }
+
+    class PoliticaReserva {
+        Long id
+        String nome
+        Integer antecedenciaMinimaHoras
+        Integer duracaoMaximaHoras
+        boolean permiteFimDeSemana
+        boolean requerAprovacaoAdmin
+    }
+
+    Predio "1" --> "*" Espaco
+    Predio "1" --> "*" HorarioFuncionamento
+    Espaco "1" --> "*" HorarioFuncionamento
+    Espaco "1" --> "*" Indisponibilidade
+    Espaco "*" --> "*" RecursoEspaco
+    Usuario "1" --> "*" Reserva
+    Espaco "1" --> "*" Reserva
+    Reserva *-- HorarioReserva
+    Usuario "1" --> "*" Notificacao
+    Reserva "0..1" --> "*" Notificacao
 ```
+
+## Decisoes de design
+
+- `Usuario` concreto reduz tabelas e classes sem comportamento proprio.
+- `Espaco` concreto com `TipoEspaco` evita subclasses sem atributos diferentes.
+- `HorarioFuncionamento` separa disponibilidade recorrente de reservas pontuais.
+- `Indisponibilidade` permite registrar bloqueios planejados sem misturar com reserva.
+- `HorarioReserva` continua como objeto de valor embutido, concentrando validacao temporal.
+- `PoliticaReserva` deixa regras parametrizaveis prontas para evolucao sem espalhar constantes.

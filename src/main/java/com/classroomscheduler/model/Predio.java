@@ -1,9 +1,15 @@
 package com.classroomscheduler.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Predio {
@@ -17,6 +23,10 @@ public class Predio {
     private String codigo;
 
     private String localizacao;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "predio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HorarioFuncionamento> horariosFuncionamento = new ArrayList<>();
 
     public Predio() {
     }
@@ -51,5 +61,13 @@ public class Predio {
 
     public void setLocalizacao(String localizacao) {
         this.localizacao = localizacao;
+    }
+
+    public List<HorarioFuncionamento> getHorariosFuncionamento() {
+        return horariosFuncionamento;
+    }
+
+    public void setHorariosFuncionamento(List<HorarioFuncionamento> horariosFuncionamento) {
+        this.horariosFuncionamento = horariosFuncionamento;
     }
 }

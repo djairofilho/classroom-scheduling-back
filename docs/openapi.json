@@ -25,7 +25,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Solicitante"
+                    "$ref": "#/components/schemas/Usuario"
                   }
                 }
               }
@@ -54,7 +54,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Solicitante"
+                  "$ref": "#/components/schemas/Usuario"
                 }
               }
             }
@@ -259,6 +259,66 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Espaco"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
                 }
               }
             }
@@ -499,7 +559,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Solicitante"
+                  "$ref": "#/components/schemas/Usuario"
                 }
               }
             }
@@ -529,7 +589,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Solicitante"
+                  "$ref": "#/components/schemas/Usuario"
                 }
               }
             }
@@ -895,6 +955,26 @@
           }
         }
       }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioAuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -910,7 +990,7 @@
           }
         }
       },
-      "Solicitante": {
+      "Usuario": {
         "type": "object",
         "properties": {
           "id": {
@@ -922,6 +1002,20 @@
           },
           "email": {
             "type": "string"
+          },
+          "papel": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "SOLICITANTE"
+            ]
+          },
+          "tipoSolicitante": {
+            "type": "string",
+            "enum": [
+              "ALUNO",
+              "FUNCIONARIO"
+            ]
           }
         }
       },
@@ -959,6 +1053,15 @@
           "nome": {
             "type": "string"
           },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "SALA",
+              "AUDITORIO",
+              "QUADRA",
+              "LABORATORIO"
+            ]
+          },
           "capacidade": {
             "type": "integer",
             "format": "int32"
@@ -971,10 +1074,16 @@
           },
           "predio": {
             "$ref": "#/components/schemas/Predio"
+          },
+          "recursos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecursoEspaco"
+            }
           }
         }
       },
-      "Horarios": {
+      "HorarioReserva": {
         "type": "object",
         "properties": {
           "inicio": {
@@ -1005,6 +1114,21 @@
           }
         }
       },
+      "RecursoEspaco": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "descricao": {
+            "type": "string"
+          }
+        }
+      },
       "Reserva": {
         "type": "object",
         "properties": {
@@ -1013,13 +1137,13 @@
             "format": "int64"
           },
           "solicitante": {
-            "$ref": "#/components/schemas/Solicitante"
+            "$ref": "#/components/schemas/Usuario"
           },
           "espaco": {
             "$ref": "#/components/schemas/Espaco"
           },
           "horarios": {
-            "$ref": "#/components/schemas/Horarios"
+            "$ref": "#/components/schemas/HorarioReserva"
           },
           "motivo": {
             "type": "string"
@@ -1058,21 +1182,6 @@
           }
         }
       },
-      "Usuario": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "nome": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        }
-      },
       "CreateEspacoRequest": {
         "type": "object",
         "properties": {
@@ -1089,6 +1198,54 @@
           "predioId": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "AuthRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "senha": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioAuthResponse"
+          }
+        }
+      },
+      "UsuarioAuthResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "email": {
+            "type": "string"
+          },
+          "papel": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "SOLICITANTE"
+            ]
+          },
+          "tipoSolicitante": {
+            "type": "string",
+            "enum": [
+              "ALUNO",
+              "FUNCIONARIO"
+            ]
           }
         }
       }

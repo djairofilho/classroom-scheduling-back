@@ -5,10 +5,8 @@ import com.classroomscheduler.dto.AuthResponse;
 import com.classroomscheduler.exception.NaoAutorizadoException;
 import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.PapelUsuario;
-import com.classroomscheduler.model.Solicitante;
 import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.model.Usuario;
-import com.classroomscheduler.repository.SolicitanteRepository;
 import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,18 +17,15 @@ import java.util.Locale;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
-    private final SolicitanteRepository solicitanteRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(
             UsuarioRepository usuarioRepository,
-            SolicitanteRepository solicitanteRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService
     ) {
         this.usuarioRepository = usuarioRepository;
-        this.solicitanteRepository = solicitanteRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -43,14 +38,14 @@ public class AuthService {
             throw new RegraDeNegocioException("Ja existe usuario com esse email.");
         }
 
-        Solicitante solicitante = new Solicitante();
+        Usuario solicitante = new Usuario();
         solicitante.setEmail(email);
         solicitante.setNome(email);
         solicitante.setPapel(PapelUsuario.SOLICITANTE);
         solicitante.setTipoSolicitante(inferirTipoSolicitante(email));
         solicitante.setSenhaHash(passwordEncoder.encode(request.getSenha()));
 
-        Usuario salvo = solicitanteRepository.save(solicitante);
+        Usuario salvo = usuarioRepository.save(solicitante);
         return new AuthResponse(jwtService.gerarToken(salvo), salvo);
     }
 

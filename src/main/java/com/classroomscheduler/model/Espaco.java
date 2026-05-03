@@ -1,24 +1,34 @@
 package com.classroomscheduler.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Espaco {
+public class Espaco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
+
+    @Enumerated(EnumType.STRING)
+    private TipoEspaco tipo;
 
     private Integer capacidade;
 
@@ -29,6 +39,22 @@ public abstract class Espaco {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "predio_id")
     private Predio predio;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HorarioFuncionamento> horariosFuncionamento = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Indisponibilidade> indisponibilidades = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "espaco_recurso",
+            joinColumns = @JoinColumn(name = "espaco_id"),
+            inverseJoinColumns = @JoinColumn(name = "recurso_id")
+    )
+    private List<RecursoEspaco> recursos = new ArrayList<>();
 
     public Espaco() {
     }
@@ -47,6 +73,14 @@ public abstract class Espaco {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public TipoEspaco getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoEspaco tipo) {
+        this.tipo = tipo;
     }
 
     public Integer getCapacidade() {
@@ -79,5 +113,29 @@ public abstract class Espaco {
 
     public void setPredio(Predio predio) {
         this.predio = predio;
+    }
+
+    public List<HorarioFuncionamento> getHorariosFuncionamento() {
+        return horariosFuncionamento;
+    }
+
+    public void setHorariosFuncionamento(List<HorarioFuncionamento> horariosFuncionamento) {
+        this.horariosFuncionamento = horariosFuncionamento;
+    }
+
+    public List<Indisponibilidade> getIndisponibilidades() {
+        return indisponibilidades;
+    }
+
+    public void setIndisponibilidades(List<Indisponibilidade> indisponibilidades) {
+        this.indisponibilidades = indisponibilidades;
+    }
+
+    public List<RecursoEspaco> getRecursos() {
+        return recursos;
+    }
+
+    public void setRecursos(List<RecursoEspaco> recursos) {
+        this.recursos = recursos;
     }
 }

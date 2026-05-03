@@ -34,125 +34,118 @@ O projeto organiza o processo de reserva de espacos academicos de forma simples 
 
 ## Dominio do problema
 
-O sistema foi planejado para destacar conceitos importantes de orientacao a objetos e modelagem:
+O sistema foi ajustado para usar classes de dominio com responsabilidade real, evitando subclasses vazias. `Admin` e `Solicitante` agora sao valores do campo `papel` em `Usuario`; `Sala`, `Auditorio`, `Quadra` e `Laboratorio` sao valores do campo `tipo` em `Espaco`.
 
-- Heranca em `Usuario`, com especializacoes `Admin` e `Solicitante`
-- Generalizacao em `Espaco`, com especializacoes `Sala`, `Auditorio`, `Quadra` e `Laboratorio`
-- Composicao entre `Reserva` e `Horarios`
-- Associacoes entre `Espaco`, `Predio` e `Notificacao`
+- `Usuario` concentra autenticacao, papel e tipo de solicitante
+- `Espaco` concentra os dados reservaveis e usa `TipoEspaco` para diferenciar sala, auditorio, quadra e laboratorio
+- `HorarioFuncionamento` representa dias e janelas de abertura de predios e espacos
+- `Reserva` usa `HorarioReserva` para encapsular inicio, fim e validacao temporal
+- `Indisponibilidade`, `RecursoEspaco`, `PoliticaReserva` e `Notificacao` deixam regras operacionais explicitas no dominio
 - Regras de reserva centralizadas no dominio
 
-Os principais elementos do dominio sao:
+As 10 classes de dominio sao:
 
 - `Usuario`
-- `Admin`
-- `Solicitante`
 - `Predio`
-- `Reserva`
-- `Horarios`
-- `Notificacao`
 - `Espaco`
-- `Sala`
-- `Auditorio`
-- `Quadra`
-- `Laboratorio`
+- `HorarioFuncionamento`
+- `Reserva`
+- `HorarioReserva`
+- `Indisponibilidade`
+- `RecursoEspaco`
+- `Notificacao`
+- `PoliticaReserva`
 
 ## Diagrama de classes
 
-O modelo conceitual possui as classes do dominio, mas a persistencia em banco segue o mapeamento JPA atual. Como `Horarios` esta marcado com `@Embeddable`, ele nao vira tabela propria: os campos `inicio` e `fim` ficam na tabela `reserva`.
+O modelo conceitual possui as classes do dominio. Como `HorarioReserva` esta marcado com `@Embeddable`, ele nao vira tabela propria: os campos `inicio` e `fim` ficam na tabela `reserva`.
 
 ```mermaid
-erDiagram
-    USUARIO {
-        bigint id PK
-        string nome
-        string email
-        string senha_hash
-        string papel
-        string tipo_solicitante
+classDiagram
+    class Usuario {
+        Long id
+        String nome
+        String email
+        String senhaHash
+        PapelUsuario papel
+        TipoSolicitante tipoSolicitante
     }
-
-    ADMIN {
-        bigint id PK, FK
+    class Predio {
+        Long id
+        String nome
+        String codigo
+        String localizacao
     }
-
-    SOLICITANTE {
-        bigint id PK, FK
-    }
-
-    PREDIO {
-        bigint id PK
-        string nome
-        string codigo
-        string localizacao
-    }
-
-    ESPACO {
-        bigint id PK
-        string nome
-        int capacidade
+    class Espaco {
+        Long id
+        String nome
+        TipoEspaco tipo
+        Integer capacidade
         boolean indisponivel
-        string motivo_indisponibilidade
-        bigint predio_id FK
+        String motivoIndisponibilidade
     }
-
-    SALA {
-        bigint id PK, FK
+    class HorarioFuncionamento {
+        Long id
+        DiaSemana diaSemana
+        LocalTime abertura
+        LocalTime fechamento
+        boolean ativo
     }
-
-    AUDITORIO {
-        bigint id PK, FK
-    }
-
-    QUADRA {
-        bigint id PK, FK
-    }
-
-    LABORATORIO {
-        bigint id PK, FK
-    }
-
-    RESERVA {
-        bigint id PK
-        bigint solicitante_id FK
-        bigint espaco_id FK
-        datetime inicio
-        datetime fim
-        string motivo
+    class Reserva {
+        Long id
+        String motivo
         boolean cancelada
-        datetime criada_em
+        LocalDateTime criadaEm
     }
-
-    NOTIFICACAO {
-        bigint id PK
-        bigint destinatario_id FK
-        bigint reserva_id FK
-        string mensagem
+    class HorarioReserva {
+        LocalDateTime inicio
+        LocalDateTime fim
+        validar()
+        conflita()
+    }
+    class Indisponibilidade {
+        Long id
+        LocalDateTime inicio
+        LocalDateTime fim
+        String motivo
+    }
+    class RecursoEspaco {
+        Long id
+        String nome
+        String descricao
+    }
+    class Notificacao {
+        Long id
+        String mensagem
         boolean lida
-        datetime enviada_em
+        LocalDateTime enviadaEm
+    }
+    class PoliticaReserva {
+        Long id
+        String nome
+        Integer antecedenciaMinimaHoras
+        Integer duracaoMaximaHoras
+        boolean permiteFimDeSemana
+        boolean requerAprovacaoAdmin
     }
 
-    USUARIO ||--o| ADMIN : heranca
-    USUARIO ||--o| SOLICITANTE : heranca
-
-    ESPACO ||--o| SALA : heranca
-    ESPACO ||--o| AUDITORIO : heranca
-    ESPACO ||--o| QUADRA : heranca
-    ESPACO ||--o| LABORATORIO : heranca
-
-    PREDIO ||--o{ ESPACO : possui
-    USUARIO ||--o{ RESERVA : cria
-    ESPACO ||--o{ RESERVA : recebe
-    USUARIO ||--o{ NOTIFICACAO : destinatario
-    RESERVA o|--o{ NOTIFICACAO : referencia
+    Predio "1" --> "*" Espaco
+    Predio "1" --> "*" HorarioFuncionamento
+    Espaco "1" --> "*" HorarioFuncionamento
+    Espaco "1" --> "*" Indisponibilidade
+    Espaco "*" --> "*" RecursoEspaco
+    Usuario "1" --> "*" Reserva
+    Espaco "1" --> "*" Reserva
+    Reserva *-- HorarioReserva
+    Usuario "1" --> "*" Notificacao
+    Reserva "0..1" --> "*" Notificacao
 ```
 
 ## Regras de negocio centrais
 
 - Nao pode existir reserva em conflito de horario para o mesmo espaco
 - Nao pode reservar espaco indisponivel
-- `Horarios` deve ser valido, com fim posterior ao inicio
-- Nao pode criar reserva no passado
+- `HorarioReserva` deve ser valido, com fim posterior ao inicio
 - O `Solicitante` pode cancelar apenas a propria reserva
 - O `Admin` pode cancelar qualquer reserva
 - O `Admin` tambem pode criar reservas associadas a sua propria conta
@@ -184,8 +177,8 @@ Registro rapido:
 
 Regras do registro:
 
-- emails `@al.insper.edu.br` viram `Solicitante` com `tipoSolicitante = ALUNO`
-- emails `@insper.edu.br` viram `Solicitante` com `tipoSolicitante = FUNCIONARIO`
+- emails `@al.insper.edu.br` viram `Usuario` com `papel = SOLICITANTE` e `tipoSolicitante = ALUNO`
+- emails `@insper.edu.br` viram `Usuario` com `papel = SOLICITANTE` e `tipoSolicitante = FUNCIONARIO`
 - senhas sao armazenadas com BCrypt em `senhaHash`
 - a resposta nunca retorna `senhaHash`
 
@@ -288,10 +281,12 @@ Executar a aplicacao:
 
 Por padrao, a aplicacao sobe com uma seed local de demonstracao habilitada. Ela cria:
 
-- um `Admin` padrao (`admin@insper.edu.br` / `admin1234`)
+- um usuario admin padrao (`admin@insper.edu.br` / `admin1234`)
 - dois `Predios`
 - quatro `Espacos`
-- dois `Solicitantes`
+- horarios de funcionamento dos predios e de espacos de demonstracao
+- recursos de espaco e uma politica padrao de reserva
+- dois usuarios solicitantes
 - uma `Reserva` futura para solicitante
 - uma `Reserva` futura para admin
 - `Notificacoes` iniciais para explorar a API
@@ -360,4 +355,4 @@ Como o banco esta em memoria, os dados sao perdidos ao encerrar a aplicacao.
 
 ## Observacao
 
-Esta documentacao agora usa como base as classes obrigatorias do projeto e deve servir como guia direto para a implementacao do dominio.
+Esta documentacao usa como base as classes de dominio do projeto e deve servir como guia direto para a implementacao.

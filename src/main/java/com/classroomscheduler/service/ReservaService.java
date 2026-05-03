@@ -3,7 +3,7 @@ package com.classroomscheduler.service;
 import com.classroomscheduler.dto.CreateReservaRequest;
 import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.exception.RegraDeNegocioException;
-import com.classroomscheduler.model.Horarios;
+import com.classroomscheduler.model.HorarioReserva;
 import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.ReservaRepository;
@@ -77,7 +77,7 @@ public class ReservaService {
             throw new RegraDeNegocioException("Ja existe reserva para o espaco nesse horario.");
         }
 
-        Horarios horarios = new Horarios();
+        HorarioReserva horarios = new HorarioReserva();
         horarios.setInicio(inicio);
         horarios.setFim(fim);
         horarios.validar();

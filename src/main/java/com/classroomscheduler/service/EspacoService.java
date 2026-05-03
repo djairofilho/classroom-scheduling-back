@@ -3,15 +3,13 @@ package com.classroomscheduler.service;
 import com.classroomscheduler.dto.CreateEspacoRequest;
 import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.exception.RegraDeNegocioException;
-import com.classroomscheduler.model.Auditorio;
 import com.classroomscheduler.model.Espaco;
-import com.classroomscheduler.model.Laboratorio;
-import com.classroomscheduler.model.Quadra;
-import com.classroomscheduler.model.Sala;
+import com.classroomscheduler.model.TipoEspaco;
 import com.classroomscheduler.repository.EspacoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class EspacoService {
@@ -62,8 +60,9 @@ public class EspacoService {
             throw new RegraDeNegocioException("Espaco deve possuir predio.");
         }
 
-        Espaco espaco = criarPorTipo(request.getTipo());
+        Espaco espaco = new Espaco();
         espaco.setNome(request.getNome());
+        espaco.setTipo(parseTipo(request.getTipo()));
         espaco.setCapacidade(request.getCapacidade());
         espaco.setPredio(predioService.buscarPorId(request.getPredioId()));
         espaco.setIndisponivel(false);
@@ -78,13 +77,11 @@ public class EspacoService {
         return espacoRepository.save(espaco);
     }
 
-    private Espaco criarPorTipo(String tipo) {
-        return switch (tipo.toUpperCase()) {
-            case "SALA" -> new Sala();
-            case "AUDITORIO" -> new Auditorio();
-            case "QUADRA" -> new Quadra();
-            case "LABORATORIO" -> new Laboratorio();
-            default -> throw new RegraDeNegocioException("Tipo de espaco invalido.");
-        };
+    private TipoEspaco parseTipo(String tipo) {
+        try {
+            return TipoEspaco.valueOf(tipo.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            throw new RegraDeNegocioException("Tipo de espaco invalido.");
+        }
     }
 }

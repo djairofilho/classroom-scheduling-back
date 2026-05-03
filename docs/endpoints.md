@@ -10,13 +10,56 @@ http://localhost:8080
 
 Contrato OpenAPI exportado:
 
-- [OpenAPI JSON](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/openapi.json)
+- [OpenAPI JSON](openapi.json)
+
+As rotas protegidas exigem:
+
+```http
+Authorization: Bearer <token>
+```
 
 ## Health
 
 ### `GET /health`
 
 Retorna o status basico da aplicacao.
+
+## Auth
+
+### `POST /auth/register`
+
+Cria um `Usuario` com `papel = SOLICITANTE` usando apenas email e senha.
+
+Exemplo de body:
+
+```json
+{
+  "email": "aluno@al.insper.edu.br",
+  "senha": "senha123"
+}
+```
+
+Dominios aceitos:
+
+- `@al.insper.edu.br`: `tipoSolicitante = ALUNO`
+- `@insper.edu.br`: `tipoSolicitante = FUNCIONARIO`
+
+### `POST /auth/login`
+
+Autentica usuario e retorna JWT.
+
+Exemplo de body:
+
+```json
+{
+  "email": "admin@insper.edu.br",
+  "senha": "admin1234"
+}
+```
+
+### `GET /auth/me`
+
+Retorna o usuario autenticado a partir do JWT.
 
 ## Usuarios
 
@@ -40,19 +83,19 @@ Remove um usuario por id.
 
 ### `GET /solicitantes`
 
-Lista todos os solicitantes.
+Lista usuarios com `papel = SOLICITANTE`.
 
 ### `GET /solicitantes/{id}`
 
-Busca um solicitante por id.
+Busca um usuario solicitante por id.
 
 ### `GET /solicitantes/buscar?email=...`
 
-Busca um solicitante por email.
+Busca um usuario solicitante por email.
 
 ### `POST /solicitantes`
 
-Cria um solicitante.
+Cria um usuario solicitante.
 
 Exemplo de body:
 
@@ -111,7 +154,7 @@ Lista os espacos vinculados a um predio.
 
 ### `POST /espacos`
 
-Cria um espaco concreto.
+Cria um espaco com tipo.
 
 Exemplo de body:
 
@@ -160,11 +203,11 @@ Lista reservas nao canceladas.
 
 ### `GET /reservas/por-solicitante?solicitanteId=...`
 
-Lista reservas de um solicitante.
+Lista reservas de um usuario solicitante. Usuarios com `papel = SOLICITANTE` so podem consultar o proprio id; `ADMIN` pode consultar qualquer id.
 
 ### `POST /reservas`
 
-Cria uma reserva.
+Cria uma reserva. Para usuarios solicitantes, o backend usa o id do usuario autenticado, mesmo que `solicitanteId` venha no body. Para admin, o `solicitanteId` informado e respeitado e pode ser o proprio admin.
 
 Exemplo de body:
 
@@ -226,12 +269,16 @@ Marca uma notificacao como lida.
 
 Com a seed local habilitada, a aplicacao sobe com dados basicos para demonstracao:
 
-- `usuarioId = 1` para o admin padrao
+- `usuarioId = 1` normalmente representa o admin padrao
 - `predioId = 1` e `predioId = 2`
 - `espacoId = 1` para `Sala 101`
-- `solicitanteId = 2` para `Ana Souza`
-- `destinatarioId = 2` para notificacoes da Ana
+- `solicitanteId = 2` normalmente representa `ana.souza@al.insper.edu.br`
+- `destinatarioId = 2` normalmente representa notificacoes da Ana
 - `reservaId = 1` para a reserva de exemplo
+- horarios de funcionamento sao criados para predios e espacos de demonstracao
+- recursos de espaco e uma politica padrao de reserva sao criados para desenvolvimento local
+
+Os IDs podem variar caso o banco ja tenha dados criados antes da seed.
 
 ## Respostas esperadas
 

@@ -7,7 +7,7 @@ import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;
 
 @Embeddable
-public class Horarios {
+public class HorarioReserva {
 
     @Column(name = "inicio", nullable = false)
     private LocalDateTime inicio;
@@ -15,10 +15,10 @@ public class Horarios {
     @Column(name = "fim", nullable = false)
     private LocalDateTime fim;
 
-    public Horarios() {
+    public HorarioReserva() {
     }
 
-    public boolean conflita(Horarios outro) {
+    public boolean conflita(HorarioReserva outro) {
         if (outro == null || inicio == null || fim == null || outro.inicio == null || outro.fim == null) {
             return false;
         }
