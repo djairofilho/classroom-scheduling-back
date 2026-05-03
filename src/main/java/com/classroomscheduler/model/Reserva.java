@@ -1,5 +1,6 @@
 package com.classroomscheduler.model;
 
+import com.classroomscheduler.exception.RegraDeNegocioException;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,7 +56,7 @@ public class Reserva {
 
     private void validarReserva() {
         if (horarios == null) {
-            throw new IllegalStateException("Reserva deve possuir horarios.");
+            throw new RegraDeNegocioException("Reserva deve possuir horarios.");
         }
 
         horarios.validar();

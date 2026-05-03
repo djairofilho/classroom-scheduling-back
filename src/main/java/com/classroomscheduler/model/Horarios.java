@@ -1,5 +1,6 @@
 package com.classroomscheduler.model;
 
+import com.classroomscheduler.exception.RegraDeNegocioException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -27,11 +28,11 @@ public class Horarios {
 
     public void validar() {
         if (inicio == null || fim == null) {
-            throw new IllegalStateException("Horario deve possuir inicio e fim.");
+            throw new RegraDeNegocioException("Horario deve possuir inicio e fim.");
         }
 
         if (!fim.isAfter(inicio)) {
-            throw new IllegalStateException("Fim deve ser posterior ao inicio.");
+            throw new RegraDeNegocioException("Fim deve ser posterior ao inicio.");
         }
     }
 
