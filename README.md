@@ -10,6 +10,7 @@ O projeto organiza o processo de reserva de espacos academicos de forma simples 
 - separacao de responsabilidades entre camadas
 - regras de negocio centralizadas
 - API REST para operacoes principais de consulta, reserva e notificacao
+- autenticacao com JWT para solicitantes e administradores
 
 ## Escopo funcional
 
@@ -29,6 +30,7 @@ O projeto organiza o processo de reserva de espacos academicos de forma simples 
 - Marcar indisponibilidade de espacos
 - Cancelar qualquer reserva
 - Consultar notificacoes emitidas pelo sistema
+- Criar e acompanhar reservas usando sua propria conta administrativa
 
 ## Dominio do problema
 
@@ -65,6 +67,9 @@ erDiagram
         bigint id PK
         string nome
         string email
+        string senha_hash
+        string papel
+        string tipo_solicitante
     }
 
     ADMIN {
@@ -136,7 +141,7 @@ erDiagram
     ESPACO ||--o| LABORATORIO : heranca
 
     PREDIO ||--o{ ESPACO : possui
-    SOLICITANTE ||--o{ RESERVA : cria
+    USUARIO ||--o{ RESERVA : cria
     ESPACO ||--o{ RESERVA : recebe
     USUARIO ||--o{ NOTIFICACAO : destinatario
     RESERVA o|--o{ NOTIFICACAO : referencia
@@ -150,7 +155,62 @@ erDiagram
 - Nao pode criar reserva no passado
 - O `Solicitante` pode cancelar apenas a propria reserva
 - O `Admin` pode cancelar qualquer reserva
+- O `Admin` tambem pode criar reservas associadas a sua propria conta
 - O sistema deve gerar `Notificacao` em eventos relevantes da reserva
+
+## Autenticacao e acesso
+
+A API usa JWT. As rotas publicas principais sao:
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /health`
+- Swagger/OpenAPI e console H2 local
+
+As demais rotas exigem header:
+
+```http
+Authorization: Bearer <token>
+```
+
+Registro rapido:
+
+```json
+{
+  "email": "aluno@al.insper.edu.br",
+  "senha": "senha123"
+}
+```
+
+Regras do registro:
+
+- emails `@al.insper.edu.br` viram `Solicitante` com `tipoSolicitante = ALUNO`
+- emails `@insper.edu.br` viram `Solicitante` com `tipoSolicitante = FUNCIONARIO`
+- senhas sao armazenadas com BCrypt em `senhaHash`
+- a resposta nunca retorna `senhaHash`
+
+Login:
+
+```json
+{
+  "email": "admin@insper.edu.br",
+  "senha": "admin1234"
+}
+```
+
+Resposta de autenticacao:
+
+```json
+{
+  "token": "...",
+  "usuario": {
+    "id": 1,
+    "email": "admin@insper.edu.br",
+    "papel": "ADMIN",
+    "tipoSolicitante": null
+  }
+}
+```
 
 ## Arquitetura
 
@@ -161,7 +221,7 @@ O projeto segue uma arquitetura em camadas com Spring Boot:
 - `repository`: acesso aos dados com Spring Data JPA
 - `model`: entidades e objetos de valor do dominio
 - `dto`: contratos de entrada e saida da API
-- `exception`: tratamento padronizado de erros
+- `exception`: excecoes de dominio/API e tratamento padronizado de erros
 
 Estrutura atual do codigo:
 
@@ -177,6 +237,12 @@ src/main/java/com/classroomscheduler
 ```
 
 ## Endpoints atuais
+
+### Auth
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
 
 ### Espacos
 
@@ -204,7 +270,7 @@ src/main/java/com/classroomscheduler
 - `POST /notificacoes`
 - `PATCH /notificacoes/{id}/lida`
 
-Os detalhes de contratos e exemplos estao em [docs/endpoints.md](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/endpoints.md).
+Os detalhes de contratos e exemplos estao em [docs/endpoints.md](docs/endpoints.md).
 
 ## Como executar
 
@@ -222,12 +288,23 @@ Executar a aplicacao:
 
 Por padrao, a aplicacao sobe com uma seed local de demonstracao habilitada. Ela cria:
 
-- um `Admin` padrao
+- um `Admin` padrao (`admin@insper.edu.br` / `admin1234`)
 - dois `Predios`
 - quatro `Espacos`
 - dois `Solicitantes`
-- uma `Reserva` futura de exemplo
+- uma `Reserva` futura para solicitante
+- uma `Reserva` futura para admin
 - `Notificacoes` iniciais para explorar a API
+
+Variaveis uteis:
+
+```powershell
+$env:APP_ADMIN_NOME='Administrador Padrao'
+$env:APP_ADMIN_EMAIL='admin@insper.edu.br'
+$env:APP_ADMIN_PASSWORD='admin1234'
+$env:APP_JWT_SECRET='dev-secret-key-change-me-dev-secret-key-change-me'
+$env:APP_JWT_EXPIRATION_MILLIS='7200000'
+```
 
 Para desligar a seed local, defina:
 
@@ -256,7 +333,7 @@ http://localhost:8080/docs/swagger-ui.html
 
 ## Banco de dados
 
-O projeto esta configurado com H2 em memoria em [src/main/resources/application.properties](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/src/main/resources/application.properties).
+O projeto esta configurado com H2 em memoria em [src/main/resources/application.properties](src/main/resources/application.properties).
 
 - JDBC URL: `jdbc:h2:mem:testdb`
 - Usuario: `sa`
@@ -273,13 +350,13 @@ Como o banco esta em memoria, os dados sao perdidos ao encerrar a aplicacao.
 
 ## Documentacao complementar
 
-- [Modelagem de dominio](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/modelagem-de-dominio.md)
-- [Regras de negocio](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/regras-de-negocio.md)
-- [Endpoints da API](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/endpoints.md)
-- [Contrato OpenAPI](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/openapi.json)
-- [Collection Postman](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/api-collection.postman_collection.json)
-- [Backlog do produto](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/backlog-do-produto.md)
-- [Padrao de commits e PRs](/C:/Users/Usuario/Documents/Insper/arq_obj/Agendamento/docs/padrao-de-commits-e-prs.md)
+- [Modelagem de dominio](docs/modelagem-de-dominio.md)
+- [Regras de negocio](docs/regras-de-negocio.md)
+- [Endpoints da API](docs/endpoints.md)
+- [Contrato OpenAPI](docs/openapi.json)
+- [Collection Postman](docs/api-collection.postman_collection.json)
+- [Backlog do produto](docs/backlog-do-produto.md)
+- [Padrao de commits e PRs](docs/padrao-de-commits-e-prs.md)
 
 ## Observacao
 
