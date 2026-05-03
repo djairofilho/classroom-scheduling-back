@@ -1,5 +1,6 @@
 package com.classroomscheduler.config;
 
+import com.classroomscheduler.model.Admin;
 import com.classroomscheduler.model.Auditorio;
 import com.classroomscheduler.model.Espaco;
 import com.classroomscheduler.model.Horarios;
@@ -12,6 +13,8 @@ import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.model.Sala;
 import com.classroomscheduler.model.Solicitante;
 import com.classroomscheduler.model.TipoSolicitante;
+import com.classroomscheduler.model.Usuario;
+import com.classroomscheduler.repository.AdminRepository;
 import com.classroomscheduler.repository.EspacoRepository;
 import com.classroomscheduler.repository.NotificacaoRepository;
 import com.classroomscheduler.repository.PredioRepository;
@@ -21,8 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Configuration
 public class DemoDataConfig {
@@ -31,9 +36,14 @@ public class DemoDataConfig {
     public CommandLineRunner demoDataRunner(
             PredioRepository predioRepository,
             EspacoRepository espacoRepository,
+            AdminRepository adminRepository,
             SolicitanteRepository solicitanteRepository,
             ReservaRepository reservaRepository,
             NotificacaoRepository notificacaoRepository,
+            PasswordEncoder passwordEncoder,
+            @Value("${APP_ADMIN_NOME:Administrador Padrao}") String adminNome,
+            @Value("${APP_ADMIN_EMAIL:admin@insper.edu.br}") String adminEmail,
+            @Value("${APP_ADMIN_PASSWORD:admin1234}") String adminPassword,
             @Value("${APP_DEMO_DATA_ENABLED:true}") boolean demoDataEnabled
     ) {
         return args -> {
@@ -75,7 +85,7 @@ public class DemoDataConfig {
                     null
             );
 
-            buscarOuCriarEspaco(
+            Espaco auditorioPrincipal = buscarOuCriarEspaco(
                     espacoRepository,
                     predioB,
                     "Auditorio Principal",
@@ -105,11 +115,26 @@ public class DemoDataConfig {
                     "bruno.lima@insper.edu.br"
             );
 
+            Admin admin = buscarOuCriarAdmin(
+                    adminRepository,
+                    passwordEncoder,
+                    adminNome,
+                    adminEmail,
+                    adminPassword
+            );
+
             Reserva reservaDemo = buscarOuCriarReserva(
                     reservaRepository,
                     ana,
                     sala101,
                     "Apresentacao de projeto integrador"
+            );
+
+            Reserva reservaAdmin = buscarOuCriarReserva(
+                    reservaRepository,
+                    admin,
+                    auditorioPrincipal,
+                    "Revisao administrativa da agenda"
             );
 
             buscarOuCriarNotificacao(
@@ -124,6 +149,13 @@ public class DemoDataConfig {
                     bruno,
                     null,
                     "Voce ja pode explorar a API usando os dados de demonstracao."
+            );
+
+            buscarOuCriarNotificacao(
+                    notificacaoRepository,
+                    admin,
+                    reservaAdmin,
+                    "Reserva administrativa de demonstracao criada para o painel."
             );
         };
     }
@@ -163,6 +195,25 @@ public class DemoDataConfig {
                 });
     }
 
+    private Admin buscarOuCriarAdmin(
+            AdminRepository adminRepository,
+            PasswordEncoder passwordEncoder,
+            String nome,
+            String email,
+            String senha
+    ) {
+        String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
+        return adminRepository.findByEmail(emailNormalizado)
+                .orElseGet(() -> {
+                    Admin admin = new Admin();
+                    admin.setNome(nome);
+                    admin.setEmail(emailNormalizado);
+                    admin.setPapel(PapelUsuario.ADMIN);
+                    admin.setSenhaHash(passwordEncoder.encode(senha));
+                    return adminRepository.save(admin);
+                });
+    }
+
     private Espaco buscarOuCriarEspaco(
             EspacoRepository espacoRepository,
             Predio predio,
@@ -185,7 +236,7 @@ public class DemoDataConfig {
 
     private Reserva buscarOuCriarReserva(
             ReservaRepository reservaRepository,
-            Solicitante solicitante,
+            Usuario solicitante,
             Espaco espaco,
             String motivo
     ) {
@@ -225,7 +276,7 @@ public class DemoDataConfig {
 
     private void buscarOuCriarNotificacao(
             NotificacaoRepository notificacaoRepository,
-            Solicitante destinatario,
+            Usuario destinatario,
             Reserva reserva,
             String mensagem
     ) {
