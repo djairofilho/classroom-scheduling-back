@@ -1,6 +1,8 @@
 package com.classroomscheduler.controller;
 
 import com.classroomscheduler.dto.CreateReservaRequest;
+import com.classroomscheduler.exception.AcessoNegadoException;
+import com.classroomscheduler.exception.NaoAutorizadoException;
 import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.model.Usuario;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class ReservaController {
     public ResponseEntity<List<Reserva>> listarPorSolicitante(@RequestParam Long solicitanteId, Authentication authentication) {
         Usuario usuario = usuarioAutenticado(authentication);
         if (usuario.getPapel() == PapelUsuario.SOLICITANTE && !usuario.getId().equals(solicitanteId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new AcessoNegadoException("Usuario nao pode acessar reservas de outro solicitante.");
         }
         return ResponseEntity.ok(reservaService.listarPorSolicitante(solicitanteId));
     }
@@ -71,13 +72,13 @@ public class ReservaController {
         Usuario usuario = usuarioAutenticado(authentication);
         Reserva reserva = reservaService.buscarPorId(id);
         if (usuario.getPapel() == PapelUsuario.SOLICITANTE && !usuario.getId().equals(reserva.getSolicitante().getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new AcessoNegadoException("Usuario nao pode cancelar reserva de outro solicitante.");
         }
         return ResponseEntity.ok(reservaService.cancelar(id));
     }
 
     private Usuario usuarioAutenticado(Authentication authentication) {
         return usuarioRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                .orElseThrow(() -> new NaoAutorizadoException("Usuario nao autenticado."));
     }
 }

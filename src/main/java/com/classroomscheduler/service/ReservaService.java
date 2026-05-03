@@ -1,6 +1,8 @@
 package com.classroomscheduler.service;
 
 import com.classroomscheduler.dto.CreateReservaRequest;
+import com.classroomscheduler.exception.RecursoNaoEncontradoException;
+import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.Horarios;
 import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.model.Usuario;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ReservaService {
@@ -43,24 +44,24 @@ public class ReservaService {
 
     public Reserva buscarPorId(Long id) {
         return reservaRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Reserva nao encontrada."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Reserva nao encontrada."));
     }
 
     public Reserva criar(CreateReservaRequest request) {
         if (request.getSolicitanteId() == null) {
-            throw new IllegalArgumentException("Reserva deve possuir solicitante.");
+            throw new RegraDeNegocioException("Reserva deve possuir solicitante.");
         }
 
         if (request.getEspacoId() == null) {
-            throw new IllegalArgumentException("Reserva deve possuir espaco.");
+            throw new RegraDeNegocioException("Reserva deve possuir espaco.");
         }
 
         if (request.getInicio() == null || request.getFim() == null) {
-            throw new IllegalArgumentException("Reserva deve possuir horarios.");
+            throw new RegraDeNegocioException("Reserva deve possuir horarios.");
         }
 
         Usuario solicitante = usuarioRepository.findById(request.getSolicitanteId())
-                .orElseThrow(() -> new NoSuchElementException("Usuario solicitante nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario solicitante nao encontrado."));
 
         LocalDateTime inicio = request.getInicio();
         LocalDateTime fim = request.getFim();
@@ -73,7 +74,7 @@ public class ReservaService {
                 );
 
         if (existeConflito) {
-            throw new IllegalArgumentException("Ja existe reserva para o espaco nesse horario.");
+            throw new RegraDeNegocioException("Ja existe reserva para o espaco nesse horario.");
         }
 
         Horarios horarios = new Horarios();

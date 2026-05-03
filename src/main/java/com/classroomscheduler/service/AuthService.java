@@ -2,13 +2,14 @@ package com.classroomscheduler.service;
 
 import com.classroomscheduler.dto.AuthRequest;
 import com.classroomscheduler.dto.AuthResponse;
+import com.classroomscheduler.exception.NaoAutorizadoException;
+import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Solicitante;
 import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.SolicitanteRepository;
 import com.classroomscheduler.repository.UsuarioRepository;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class AuthService {
         validarSenha(request.getSenha());
 
         if (usuarioRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Ja existe usuario com esse email.");
+            throw new RegraDeNegocioException("Ja existe usuario com esse email.");
         }
 
         Solicitante solicitante = new Solicitante();
@@ -56,10 +57,10 @@ public class AuthService {
     public AuthResponse login(AuthRequest request) {
         String email = normalizarEmail(request.getEmail());
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new BadCredentialsException("Email ou senha invalidos."));
+                .orElseThrow(() -> new NaoAutorizadoException("Email ou senha invalidos."));
 
         if (usuario.getSenhaHash() == null || !passwordEncoder.matches(request.getSenha(), usuario.getSenhaHash())) {
-            throw new BadCredentialsException("Email ou senha invalidos.");
+            throw new NaoAutorizadoException("Email ou senha invalidos.");
         }
 
         return new AuthResponse(jwtService.gerarToken(usuario), usuario);
@@ -67,7 +68,7 @@ public class AuthService {
 
     public String normalizarEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email e obrigatorio.");
+            throw new RegraDeNegocioException("Email e obrigatorio.");
         }
 
         return email.trim().toLowerCase(Locale.ROOT);
@@ -75,7 +76,7 @@ public class AuthService {
 
     private void validarSenha(String senha) {
         if (senha == null || senha.length() < 6) {
-            throw new IllegalArgumentException("Senha deve possuir pelo menos 6 caracteres.");
+            throw new RegraDeNegocioException("Senha deve possuir pelo menos 6 caracteres.");
         }
     }
 
@@ -88,6 +89,6 @@ public class AuthService {
             return TipoSolicitante.FUNCIONARIO;
         }
 
-        throw new IllegalArgumentException("Email deve ser institucional do Insper.");
+        throw new RegraDeNegocioException("Email deve ser institucional do Insper.");
     }
 }

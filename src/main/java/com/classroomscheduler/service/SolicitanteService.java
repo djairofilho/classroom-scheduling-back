@@ -1,6 +1,8 @@
 package com.classroomscheduler.service;
 
 import com.classroomscheduler.dto.CreateSolicitanteRequest;
+import com.classroomscheduler.exception.RecursoNaoEncontradoException;
+import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Solicitante;
 import com.classroomscheduler.model.TipoSolicitante;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 
 @Service
 public class SolicitanteService {
@@ -26,27 +27,27 @@ public class SolicitanteService {
 
     public Solicitante buscarPorId(Long id) {
         return solicitanteRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Solicitante nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado."));
     }
 
     public Solicitante buscarPorEmail(String email) {
         return solicitanteRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("Solicitante nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado."));
     }
 
     public Solicitante criar(CreateSolicitanteRequest request) {
         if (request.getNome() == null || request.getNome().isBlank()) {
-            throw new IllegalArgumentException("Solicitante deve possuir nome.");
+            throw new RegraDeNegocioException("Solicitante deve possuir nome.");
         }
 
         if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Solicitante deve possuir email.");
+            throw new RegraDeNegocioException("Solicitante deve possuir email.");
         }
 
         String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
 
         if (solicitanteRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Ja existe solicitante com esse email.");
+            throw new RegraDeNegocioException("Ja existe solicitante com esse email.");
         }
 
         Solicitante solicitante = new Solicitante();
@@ -66,6 +67,6 @@ public class SolicitanteService {
             return TipoSolicitante.FUNCIONARIO;
         }
 
-        throw new IllegalArgumentException("Email deve ser institucional do Insper.");
+        throw new RegraDeNegocioException("Email deve ser institucional do Insper.");
     }
 }
