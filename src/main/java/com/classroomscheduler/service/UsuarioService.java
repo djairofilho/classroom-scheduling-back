@@ -1,11 +1,11 @@
 package com.classroomscheduler.service;
 
+import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class UsuarioService {
@@ -22,12 +22,12 @@ public class UsuarioService {
 
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Usuario nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado."));
     }
 
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("Usuario nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado."));
     }
 
     public Usuario salvar(Usuario usuario) {

@@ -1,6 +1,8 @@
 package com.classroomscheduler.service;
 
 import com.classroomscheduler.dto.CreateEspacoRequest;
+import com.classroomscheduler.exception.RecursoNaoEncontradoException;
+import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.Auditorio;
 import com.classroomscheduler.model.Espaco;
 import com.classroomscheduler.model.Laboratorio;
@@ -10,7 +12,6 @@ import com.classroomscheduler.repository.EspacoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class EspacoService {
@@ -37,7 +38,7 @@ public class EspacoService {
 
     public Espaco buscarPorId(Long id) {
         return espacoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Espaco nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Espaco nao encontrado."));
     }
 
     public Espaco salvar(Espaco espaco) {
@@ -46,19 +47,19 @@ public class EspacoService {
 
     public Espaco criar(CreateEspacoRequest request) {
         if (request.getNome() == null || request.getNome().isBlank()) {
-            throw new IllegalArgumentException("Espaco deve possuir nome.");
+            throw new RegraDeNegocioException("Espaco deve possuir nome.");
         }
 
         if (request.getTipo() == null || request.getTipo().isBlank()) {
-            throw new IllegalArgumentException("Espaco deve possuir tipo.");
+            throw new RegraDeNegocioException("Espaco deve possuir tipo.");
         }
 
         if (request.getCapacidade() == null || request.getCapacidade() <= 0) {
-            throw new IllegalArgumentException("Espaco deve possuir capacidade valida.");
+            throw new RegraDeNegocioException("Espaco deve possuir capacidade valida.");
         }
 
         if (request.getPredioId() == null) {
-            throw new IllegalArgumentException("Espaco deve possuir predio.");
+            throw new RegraDeNegocioException("Espaco deve possuir predio.");
         }
 
         Espaco espaco = criarPorTipo(request.getTipo());
@@ -83,7 +84,7 @@ public class EspacoService {
             case "AUDITORIO" -> new Auditorio();
             case "QUADRA" -> new Quadra();
             case "LABORATORIO" -> new Laboratorio();
-            default -> throw new IllegalArgumentException("Tipo de espaco invalido.");
+            default -> throw new RegraDeNegocioException("Tipo de espaco invalido.");
         };
     }
 }

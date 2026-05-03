@@ -3,6 +3,7 @@ package com.classroomscheduler.controller;
 import com.classroomscheduler.dto.AuthRequest;
 import com.classroomscheduler.dto.AuthResponse;
 import com.classroomscheduler.dto.UsuarioAuthResponse;
+import com.classroomscheduler.exception.NaoAutorizadoException;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.UsuarioRepository;
 import com.classroomscheduler.service.AuthService;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
@@ -41,7 +41,7 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<UsuarioAuthResponse> me(Authentication authentication) {
         Usuario usuario = usuarioRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                .orElseThrow(() -> new NaoAutorizadoException("Usuario nao autenticado."));
         return ResponseEntity.ok(new UsuarioAuthResponse(usuario));
     }
 }

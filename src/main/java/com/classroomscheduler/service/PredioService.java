@@ -1,11 +1,11 @@
 package com.classroomscheduler.service;
 
+import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.model.Predio;
 import com.classroomscheduler.repository.PredioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class PredioService {
@@ -22,12 +22,12 @@ public class PredioService {
 
     public Predio buscarPorId(Long id) {
         return predioRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Predio nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Predio nao encontrado."));
     }
 
     public Predio buscarPorCodigo(String codigo) {
         return predioRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new NoSuchElementException("Predio nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Predio nao encontrado."));
     }
 
     public Predio salvar(Predio predio) {

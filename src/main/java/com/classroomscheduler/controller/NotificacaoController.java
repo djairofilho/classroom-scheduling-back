@@ -1,5 +1,7 @@
 package com.classroomscheduler.controller;
 
+import com.classroomscheduler.exception.AcessoNegadoException;
+import com.classroomscheduler.exception.NaoAutorizadoException;
 import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Notificacao;
 import com.classroomscheduler.model.Usuario;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -68,9 +69,9 @@ public class NotificacaoController {
 
     private void validarAcessoDestinatario(Long destinatarioId, Authentication authentication) {
         Usuario usuario = usuarioRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+                .orElseThrow(() -> new NaoAutorizadoException("Usuario nao autenticado."));
         if (usuario.getPapel() == PapelUsuario.SOLICITANTE && !usuario.getId().equals(destinatarioId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new AcessoNegadoException("Usuario nao pode acessar notificacoes de outro destinatario.");
         }
     }
 }
