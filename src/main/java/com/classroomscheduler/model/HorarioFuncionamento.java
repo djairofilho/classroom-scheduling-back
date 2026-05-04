@@ -9,10 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalTime;
 
 @Entity
+@Getter
+@Setter
 public class HorarioFuncionamento {
 
     @Id
@@ -39,55 +43,4 @@ public class HorarioFuncionamento {
     public HorarioFuncionamento() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public DiaSemana getDiaSemana() {
-        return diaSemana;
-    }
-
-    public void setDiaSemana(DiaSemana diaSemana) {
-        this.diaSemana = diaSemana;
-    }
-
-    public LocalTime getAbertura() {
-        return abertura;
-    }
-
-    public void setAbertura(LocalTime abertura) {
-        this.abertura = abertura;
-    }
-
-    public LocalTime getFechamento() {
-        return fechamento;
-    }
-
-    public void setFechamento(LocalTime fechamento) {
-        this.fechamento = fechamento;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public Predio getPredio() {
-        return predio;
-    }
-
-    public void setPredio(Predio predio) {
-        this.predio = predio;
-    }
-
-    public Espaco getEspaco() {
-        return espaco;
-    }
-
-    public void setEspaco(Espaco espaco) {
-        this.espaco = espaco;
-    }
 }
