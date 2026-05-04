@@ -3,9 +3,13 @@ package com.classroomscheduler.model;
 import com.classroomscheduler.exception.RegraDeNegocioException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Embeddable
 public class HorarioReserva {
 
@@ -36,19 +40,4 @@ public class HorarioReserva {
         }
     }
 
-    public LocalDateTime getInicio() {
-        return inicio;
-    }
-
-    public void setInicio(LocalDateTime inicio) {
-        this.inicio = inicio;
-    }
-
-    public LocalDateTime getFim() {
-        return fim;
-    }
-
-    public void setFim(LocalDateTime fim) {
-        this.fim = fim;
-    }
 }

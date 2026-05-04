@@ -11,10 +11,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 public class Reserva {
 
     @Id
@@ -62,59 +66,4 @@ public class Reserva {
         horarios.validar();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Usuario getSolicitante() {
-        return solicitante;
-    }
-
-    public void setSolicitante(Usuario solicitante) {
-        this.solicitante = solicitante;
-    }
-
-    public Espaco getEspaco() {
-        return espaco;
-    }
-
-    public void setEspaco(Espaco espaco) {
-        this.espaco = espaco;
-    }
-
-    public HorarioReserva getHorarios() {
-        return horarios;
-    }
-
-    public void setHorarios(HorarioReserva horarios) {
-        this.horarios = horarios;
-    }
-
-    public String getMotivo() {
-        return motivo;
-    }
-
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
-    }
-
-    public boolean isCancelada() {
-        return cancelada;
-    }
-
-    public void setCancelada(boolean cancelada) {
-        this.cancelada = cancelada;
-    }
-
-    public LocalDateTime getCriadaEm() {
-        return criadaEm;
-    }
-
-    public void setCriadaEm(LocalDateTime criadaEm) {
-        this.criadaEm = criadaEm;
-    }
 }

@@ -14,10 +14,14 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 public class Espaco {
 
@@ -57,85 +61,5 @@ public class Espaco {
     private List<RecursoEspaco> recursos = new ArrayList<>();
 
     public Espaco() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public TipoEspaco getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoEspaco tipo) {
-        this.tipo = tipo;
-    }
-
-    public Integer getCapacidade() {
-        return capacidade;
-    }
-
-    public void setCapacidade(Integer capacidade) {
-        this.capacidade = capacidade;
-    }
-
-    public boolean isIndisponivel() {
-        return indisponivel;
-    }
-
-    public void setIndisponivel(boolean indisponivel) {
-        this.indisponivel = indisponivel;
-    }
-
-    public String getMotivoIndisponibilidade() {
-        return motivoIndisponibilidade;
-    }
-
-    public void setMotivoIndisponibilidade(String motivoIndisponibilidade) {
-        this.motivoIndisponibilidade = motivoIndisponibilidade;
-    }
-
-    public Predio getPredio() {
-        return predio;
-    }
-
-    public void setPredio(Predio predio) {
-        this.predio = predio;
-    }
-
-    public List<HorarioFuncionamento> getHorariosFuncionamento() {
-        return horariosFuncionamento;
-    }
-
-    public void setHorariosFuncionamento(List<HorarioFuncionamento> horariosFuncionamento) {
-        this.horariosFuncionamento = horariosFuncionamento;
-    }
-
-    public List<Indisponibilidade> getIndisponibilidades() {
-        return indisponibilidades;
-    }
-
-    public void setIndisponibilidades(List<Indisponibilidade> indisponibilidades) {
-        this.indisponibilidades = indisponibilidades;
-    }
-
-    public List<RecursoEspaco> getRecursos() {
-        return recursos;
-    }
-
-    public void setRecursos(List<RecursoEspaco> recursos) {
-        this.recursos = recursos;
     }
 }
