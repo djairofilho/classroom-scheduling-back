@@ -252,17 +252,17 @@ classDiagram
         +boolean requerAprovacaoAdmin
     }
 
-    Predio "1" --> "N" Espaco : 1:N contem
-    Predio "1" --> "N" HorarioFuncionamento : 1:N horario geral
-    Espaco "1" --> "N" HorarioFuncionamento : 1:N horario proprio
-    Espaco "1" --> "N" Indisponibilidade : 1:N bloqueios
-    Usuario "1" --> "N" Indisponibilidade : 1:N criadaPor
-    Espaco "N" --> "N" RecursoEspaco : N:N recursos
-    Usuario "1" --> "N" Reserva : 1:N solicitante
-    Espaco "1" --> "N" Reserva : 1:N agenda
-    Reserva "1" *-- "1" HorarioReserva : 1:1 embute
-    Usuario "1" --> "N" Notificacao : 1:N destinatario
-    Reserva "1" --> "N" Notificacao : 1:N contexto
+    Predio "1" --> "N" Espaco : contem
+    Predio "1" --> "N" HorarioFuncionamento : horario geral
+    Espaco "1" --> "N" HorarioFuncionamento : horario proprio
+    Espaco "1" --> "N" Indisponibilidade : bloqueios
+    Usuario "1" --> "N" Indisponibilidade : criadaPor
+    Espaco "N" --> "N" RecursoEspaco : recursos
+    Usuario "1" --> "N" Reserva : solicitante
+    Espaco "1" --> "N" Reserva : agenda
+    Reserva "1" *-- "1" HorarioReserva : embute
+    Usuario "1" --> "N" Notificacao : destinatario
+    Reserva "1" --> "N" Notificacao : contexto
 ```
 
 ### Visao relacional JPA
