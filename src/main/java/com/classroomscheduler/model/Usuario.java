@@ -29,9 +29,6 @@ public class Usuario {
     private String senhaHash;
 
     @Enumerated(EnumType.STRING)
-    private PapelUsuario papel;
-
-    @Enumerated(EnumType.STRING)
     private TipoSolicitante tipoSolicitante;
 
     public Usuario() {

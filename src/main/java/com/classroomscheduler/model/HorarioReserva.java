@@ -22,14 +22,6 @@ public class HorarioReserva {
     public HorarioReserva() {
     }
 
-    public boolean conflita(HorarioReserva outro) {
-        if (outro == null || inicio == null || fim == null || outro.inicio == null || outro.fim == null) {
-            return false;
-        }
-
-        return inicio.isBefore(outro.getFim()) && fim.isAfter(outro.getInicio());
-    }
-
     public void validar() {
         if (inicio == null || fim == null) {
             throw new RegraDeNegocioException("Horario deve possuir inicio e fim.");

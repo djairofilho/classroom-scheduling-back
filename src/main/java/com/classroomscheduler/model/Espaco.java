@@ -36,29 +36,11 @@ public class Espaco {
 
     private Integer capacidade;
 
-    private boolean indisponivel;
-
-    private String motivoIndisponibilidade;
+    private boolean indisponivel = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "predio_id")
     private Predio predio;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HorarioFuncionamento> horariosFuncionamento = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "espaco", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Indisponibilidade> indisponibilidades = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "espaco_recurso",
-            joinColumns = @JoinColumn(name = "espaco_id"),
-            inverseJoinColumns = @JoinColumn(name = "recurso_id")
-    )
-    private List<RecursoEspaco> recursos = new ArrayList<>();
 
     public Espaco() {
     }

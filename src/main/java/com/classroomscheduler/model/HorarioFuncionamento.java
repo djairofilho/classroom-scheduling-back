@@ -36,10 +36,6 @@ public class HorarioFuncionamento {
     @JoinColumn(name = "predio_id")
     private Predio predio;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "espaco_id")
-    private Espaco espaco;
-
     public HorarioFuncionamento() {
     }
 
