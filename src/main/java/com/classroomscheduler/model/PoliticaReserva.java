@@ -4,8 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 public class PoliticaReserva {
 
     @Id
@@ -25,47 +29,4 @@ public class PoliticaReserva {
     public PoliticaReserva() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public Integer getAntecedenciaMinimaHoras() {
-        return antecedenciaMinimaHoras;
-    }
-
-    public void setAntecedenciaMinimaHoras(Integer antecedenciaMinimaHoras) {
-        this.antecedenciaMinimaHoras = antecedenciaMinimaHoras;
-    }
-
-    public Integer getDuracaoMaximaHoras() {
-        return duracaoMaximaHoras;
-    }
-
-    public void setDuracaoMaximaHoras(Integer duracaoMaximaHoras) {
-        this.duracaoMaximaHoras = duracaoMaximaHoras;
-    }
-
-    public boolean isPermiteFimDeSemana() {
-        return permiteFimDeSemana;
-    }
-
-    public void setPermiteFimDeSemana(boolean permiteFimDeSemana) {
-        this.permiteFimDeSemana = permiteFimDeSemana;
-    }
-
-    public boolean isRequerAprovacaoAdmin() {
-        return requerAprovacaoAdmin;
-    }
-
-    public void setRequerAprovacaoAdmin(boolean requerAprovacaoAdmin) {
-        this.requerAprovacaoAdmin = requerAprovacaoAdmin;
-    }
 }
