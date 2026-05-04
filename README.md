@@ -58,87 +58,42 @@ As 10 classes de dominio sao:
 
 ## Diagrama de classes
 
-O modelo conceitual possui as classes do dominio. Como `HorarioReserva` esta marcado com `@Embeddable`, ele nao vira tabela propria: os campos `inicio` e `fim` ficam na tabela `reserva`.
+O modelo conceitual abaixo resume as entidades principais. A versao completa, com diagrama de classes detalhado, visao relacional JPA e fluxo de reserva, esta em [docs/modelagem-de-dominio.md](docs/modelagem-de-dominio.md).
 
 ```mermaid
-classDiagram
-    class Usuario {
-        Long id
-        String nome
-        String email
-        String senhaHash
-        PapelUsuario papel
-        TipoSolicitante tipoSolicitante
-    }
-    class Predio {
-        Long id
-        String nome
-        String codigo
-        String localizacao
-    }
-    class Espaco {
-        Long id
-        String nome
-        TipoEspaco tipo
-        Integer capacidade
-        boolean indisponivel
-        String motivoIndisponibilidade
-    }
-    class HorarioFuncionamento {
-        Long id
-        DiaSemana diaSemana
-        LocalTime abertura
-        LocalTime fechamento
-        boolean ativo
-    }
-    class Reserva {
-        Long id
-        String motivo
-        boolean cancelada
-        LocalDateTime criadaEm
-    }
-    class HorarioReserva {
-        LocalDateTime inicio
-        LocalDateTime fim
-        validar()
-        conflita()
-    }
-    class Indisponibilidade {
-        Long id
-        LocalDateTime inicio
-        LocalDateTime fim
-        String motivo
-    }
-    class RecursoEspaco {
-        Long id
-        String nome
-        String descricao
-    }
-    class Notificacao {
-        Long id
-        String mensagem
-        boolean lida
-        LocalDateTime enviadaEm
-    }
-    class PoliticaReserva {
-        Long id
-        String nome
-        Integer antecedenciaMinimaHoras
-        Integer duracaoMaximaHoras
-        boolean permiteFimDeSemana
-        boolean requerAprovacaoAdmin
-    }
+flowchart LR
+    Usuario[Usuario<br/>autenticacao e papel]
+    Predio[Predio<br/>bloco fisico]
+    Espaco[Espaco<br/>recurso reservavel]
+    HorarioFuncionamento[HorarioFuncionamento<br/>abertura recorrente]
+    Reserva[Reserva<br/>agendamento]
+    HorarioReserva[HorarioReserva<br/>inicio e fim embutidos]
+    Indisponibilidade[Indisponibilidade<br/>bloqueio planejado]
+    RecursoEspaco[RecursoEspaco<br/>infraestrutura]
+    Notificacao[Notificacao<br/>aviso]
+    PoliticaReserva[PoliticaReserva<br/>regras parametrizadas]
 
-    Predio "1" --> "*" Espaco
-    Predio "1" --> "*" HorarioFuncionamento
-    Espaco "1" --> "*" HorarioFuncionamento
-    Espaco "1" --> "*" Indisponibilidade
-    Espaco "*" --> "*" RecursoEspaco
-    Usuario "1" --> "*" Reserva
-    Espaco "1" --> "*" Reserva
-    Reserva *-- HorarioReserva
-    Usuario "1" --> "*" Notificacao
-    Reserva "0..1" --> "*" Notificacao
+    Usuario -->|solicita| Reserva
+    Usuario -->|recebe| Notificacao
+    Predio -->|contem| Espaco
+    Predio -->|tem| HorarioFuncionamento
+    Espaco -->|tem| HorarioFuncionamento
+    Espaco -->|recebe| Reserva
+    Espaco -->|pode ter| Indisponibilidade
+    Espaco <-->|oferece| RecursoEspaco
+    Reserva -->|embute| HorarioReserva
+    Reserva -->|gera| Notificacao
+    PoliticaReserva -.->|valida| Reserva
+
+    classDef actor fill:#e7f5ff,stroke:#1c7ed6,color:#102a43
+    classDef place fill:#e6fcf5,stroke:#0ca678,color:#102a43
+    classDef schedule fill:#fff4e6,stroke:#f08c00,color:#102a43
+    classDef support fill:#f8f0fc,stroke:#9c36b5,color:#102a43
+
+    class Usuario actor
+    class Predio,Espaco,RecursoEspaco place
+    class Reserva,HorarioReserva,HorarioFuncionamento,Indisponibilidade schedule
+    class Notificacao,PoliticaReserva support
 ```
 
 ## Regras de negocio centrais
