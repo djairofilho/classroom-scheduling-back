@@ -62,28 +62,39 @@ O modelo conceitual abaixo resume as entidades principais. A versao completa, co
 
 ```mermaid
 flowchart LR
-    Usuario[Usuario<br/>autenticacao e papel]
-    Predio[Predio<br/>bloco fisico]
-    Espaco[Espaco<br/>recurso reservavel]
-    HorarioFuncionamento[HorarioFuncionamento<br/>abertura recorrente]
-    Reserva[Reserva<br/>agendamento]
-    HorarioReserva[HorarioReserva<br/>inicio e fim embutidos]
-    Indisponibilidade[Indisponibilidade<br/>bloqueio planejado]
-    RecursoEspaco[RecursoEspaco<br/>infraestrutura]
-    Notificacao[Notificacao<br/>aviso]
-    PoliticaReserva[PoliticaReserva<br/>regras parametrizadas]
+    subgraph Pessoas["Pessoas"]
+        Usuario[Usuario<br/>autenticacao e papel]
+    end
 
-    Usuario -->|solicita| Reserva
-    Usuario -->|recebe| Notificacao
-    Predio -->|contem| Espaco
-    Predio -->|tem| HorarioFuncionamento
-    Espaco -->|tem| HorarioFuncionamento
-    Espaco -->|recebe| Reserva
-    Espaco -->|pode ter| Indisponibilidade
-    Espaco <-->|oferece| RecursoEspaco
-    Reserva -->|embute| HorarioReserva
-    Reserva -->|gera| Notificacao
-    PoliticaReserva -.->|valida| Reserva
+    subgraph Localizacao["Espacos fisicos"]
+        Predio[Predio<br/>bloco fisico]
+        Espaco[Espaco<br/>recurso reservavel]
+        RecursoEspaco[RecursoEspaco<br/>infraestrutura]
+    end
+
+    subgraph Agenda["Agenda"]
+        HorarioFuncionamento[HorarioFuncionamento<br/>abertura recorrente]
+        Reserva[Reserva<br/>agendamento]
+        HorarioReserva[HorarioReserva<br/>inicio e fim embutidos]
+        Indisponibilidade[Indisponibilidade<br/>bloqueio planejado]
+    end
+
+    subgraph Apoio["Apoio operacional"]
+        Notificacao[Notificacao<br/>aviso]
+        PoliticaReserva[PoliticaReserva<br/>regras parametrizadas]
+    end
+
+    Usuario -->|1:N solicita| Reserva
+    Usuario -->|1:N recebe| Notificacao
+    Predio -->|1:N contem| Espaco
+    Predio -->|1:N abre em| HorarioFuncionamento
+    Espaco -->|1:N abre em| HorarioFuncionamento
+    Espaco -->|1:N recebe| Reserva
+    Espaco -->|1:N bloqueios| Indisponibilidade
+    Espaco <-->|N:N recursos| RecursoEspaco
+    Reserva -->|1:1 periodo| HorarioReserva
+    Reserva -->|1:N notifica| Notificacao
+    PoliticaReserva -.->|1:N valida| Reserva
 
     classDef actor fill:#e7f5ff,stroke:#1c7ed6,color:#102a43
     classDef place fill:#e6fcf5,stroke:#0ca678,color:#102a43

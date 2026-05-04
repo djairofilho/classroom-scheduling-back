@@ -111,32 +111,40 @@ Esta visao mostra o que existe no dominio e como cada parte participa do agendam
 
 ```mermaid
 flowchart LR
-    Usuario[Usuario<br/>ADMIN ou SOLICITANTE]
-    Predio[Predio<br/>bloco fisico]
-    Espaco[Espaco<br/>sala, auditorio,<br/>quadra ou laboratorio]
-    HorarioFuncionamento[HorarioFuncionamento<br/>janela recorrente]
-    Reserva[Reserva<br/>agendamento]
-    HorarioReserva[HorarioReserva<br/>inicio e fim]
-    Indisponibilidade[Indisponibilidade<br/>bloqueio planejado]
-    RecursoEspaco[RecursoEspaco<br/>equipamento/facilidade]
-    Notificacao[Notificacao<br/>aviso ao usuario]
-    PoliticaReserva[PoliticaReserva<br/>parametros globais]
+    subgraph Pessoas["Pessoas"]
+        Usuario[Usuario<br/>ADMIN ou SOLICITANTE]
+    end
 
-    Usuario -->|cria/cancela| Reserva
-    Usuario -->|recebe| Notificacao
-    Usuario -->|registra bloqueio| Indisponibilidade
+    subgraph Localizacao["Espacos fisicos"]
+        Predio[Predio<br/>bloco fisico]
+        Espaco[Espaco<br/>sala, auditorio,<br/>quadra ou laboratorio]
+        RecursoEspaco[RecursoEspaco<br/>equipamento/facilidade]
+    end
 
-    Predio -->|agrupa| Espaco
-    Predio -->|define abertura geral| HorarioFuncionamento
+    subgraph Agenda["Agenda"]
+        HorarioFuncionamento[HorarioFuncionamento<br/>janela recorrente]
+        Reserva[Reserva<br/>agendamento]
+        HorarioReserva[HorarioReserva<br/>inicio e fim]
+        Indisponibilidade[Indisponibilidade<br/>bloqueio planejado]
+    end
 
-    Espaco -->|recebe| Reserva
-    Espaco -->|pode sobrescrever horarios| HorarioFuncionamento
-    Espaco -->|pode estar bloqueado por| Indisponibilidade
-    Espaco <-->|oferece| RecursoEspaco
+    subgraph Apoio["Apoio operacional"]
+        Notificacao[Notificacao<br/>aviso ao usuario]
+        PoliticaReserva[PoliticaReserva<br/>parametros globais]
+    end
 
-    Reserva -->|embute| HorarioReserva
-    Reserva -->|gera contexto para| Notificacao
-    PoliticaReserva -.->|orienta validacoes| Reserva
+    Usuario -->|1:N cria/cancela| Reserva
+    Usuario -->|1:N recebe| Notificacao
+    Usuario -->|1:N registra| Indisponibilidade
+    Predio -->|1:N agrupa| Espaco
+    Predio -->|1:N abertura geral| HorarioFuncionamento
+    Espaco -->|1:N horario proprio| HorarioFuncionamento
+    Espaco -->|1:N recebe| Reserva
+    Espaco -->|1:N bloqueios| Indisponibilidade
+    Espaco <-->|N:N recursos| RecursoEspaco
+    Reserva -->|1:1 periodo| HorarioReserva
+    Reserva -->|1:N contexto| Notificacao
+    PoliticaReserva -.->|1:N validacoes| Reserva
 
     classDef actor fill:#e7f5ff,stroke:#1c7ed6,color:#102a43
     classDef place fill:#e6fcf5,stroke:#0ca678,color:#102a43
@@ -244,113 +252,73 @@ classDiagram
         +boolean requerAprovacaoAdmin
     }
 
-    Predio "1" --> "0..*" Espaco : contem
-    Predio "0..1" --> "0..*" HorarioFuncionamento : horario geral
-    Espaco "0..1" --> "0..*" HorarioFuncionamento : excecao/horario proprio
-    Espaco "1" --> "0..*" Indisponibilidade : bloqueios
-    Usuario "0..1" --> "0..*" Indisponibilidade : criadaPor
-    Espaco "0..*" --> "0..*" RecursoEspaco : recursos
-    Usuario "1" --> "0..*" Reserva : solicitante
-    Espaco "1" --> "0..*" Reserva : agenda
-    Reserva "1" *-- "1" HorarioReserva : embute
-    Usuario "1" --> "0..*" Notificacao : destinatario
-    Reserva "0..1" --> "0..*" Notificacao : contexto
+    Predio "1" --> "N" Espaco : 1:N contem
+    Predio "1" --> "N" HorarioFuncionamento : 1:N horario geral
+    Espaco "1" --> "N" HorarioFuncionamento : 1:N horario proprio
+    Espaco "1" --> "N" Indisponibilidade : 1:N bloqueios
+    Usuario "1" --> "N" Indisponibilidade : 1:N criadaPor
+    Espaco "N" --> "N" RecursoEspaco : N:N recursos
+    Usuario "1" --> "N" Reserva : 1:N solicitante
+    Espaco "1" --> "N" Reserva : 1:N agenda
+    Reserva "1" *-- "1" HorarioReserva : 1:1 embute
+    Usuario "1" --> "N" Notificacao : 1:N destinatario
+    Reserva "1" --> "N" Notificacao : 1:N contexto
 ```
 
 ### Visao relacional JPA
 
-Esta leitura ajuda a enxergar quais tabelas e chaves aparecem no banco H2. `HorarioReserva` nao aparece como tabela porque e um objeto embutido em `Reserva`.
+Esta leitura organiza as tabelas por responsabilidade e reduz cruzamento de linhas. `HorarioReserva` nao aparece como tabela porque e um objeto embutido em `Reserva`.
 
 ```mermaid
-erDiagram
-    USUARIO ||--o{ RESERVA : solicita
-    USUARIO ||--o{ NOTIFICACAO : recebe
-    USUARIO ||--o{ INDISPONIBILIDADE : cria
+flowchart LR
+    subgraph Pessoas["Pessoas"]
+        USUARIO["USUARIO<br/>PK id<br/>UK email<br/>nome, senha_hash<br/>papel, tipo_solicitante"]
+    end
 
-    PREDIO ||--o{ ESPACO : contem
-    PREDIO ||--o{ HORARIO_FUNCIONAMENTO : possui
-    ESPACO ||--o{ HORARIO_FUNCIONAMENTO : possui
-    ESPACO ||--o{ INDISPONIBILIDADE : bloqueia
-    ESPACO ||--o{ RESERVA : recebe
-    ESPACO ||--o{ ESPACO_RECURSO : vincula
-    RECURSO_ESPACO ||--o{ ESPACO_RECURSO : vincula
-    RESERVA ||--o{ NOTIFICACAO : origina
+    subgraph Espacos["Espacos fisicos"]
+        PREDIO["PREDIO<br/>PK id<br/>nome, codigo<br/>localizacao"]
+        ESPACO["ESPACO<br/>PK id<br/>FK predio_id<br/>nome, tipo, capacidade<br/>indisponivel, motivo"]
+        RECURSO_ESPACO["RECURSO_ESPACO<br/>PK id<br/>UK nome<br/>descricao"]
+        ESPACO_RECURSO["ESPACO_RECURSO<br/>FK espaco_id<br/>FK recurso_id"]
+    end
 
-    USUARIO {
-        bigint id PK
-        string nome
-        string email UK
-        string senha_hash
-        string papel
-        string tipo_solicitante
-    }
+    subgraph Agenda["Agenda e disponibilidade"]
+        HORARIO_FUNCIONAMENTO["HORARIO_FUNCIONAMENTO<br/>PK id<br/>FK predio_id opcional<br/>FK espaco_id opcional<br/>dia_semana, abertura<br/>fechamento, ativo"]
+        RESERVA["RESERVA<br/>PK id<br/>FK solicitante_id<br/>FK espaco_id<br/>inicio, fim<br/>motivo, cancelada, criada_em"]
+        INDISPONIBILIDADE["INDISPONIBILIDADE<br/>PK id<br/>FK espaco_id<br/>FK criada_por_id<br/>inicio, fim, motivo"]
+    end
 
-    PREDIO {
-        bigint id PK
-        string nome
-        string codigo
-        string localizacao
-    }
+    subgraph Comunicacao["Comunicacao"]
+        NOTIFICACAO["NOTIFICACAO<br/>PK id<br/>FK destinatario_id<br/>FK reserva_id opcional<br/>mensagem, lida, enviada_em"]
+    end
 
-    ESPACO {
-        bigint id PK
-        bigint predio_id FK
-        string nome
-        string tipo
-        int capacidade
-        boolean indisponivel
-        string motivo_indisponibilidade
-    }
+    PREDIO -->|1:N| ESPACO
+    PREDIO -->|1:N| HORARIO_FUNCIONAMENTO
+    ESPACO -->|1:N| HORARIO_FUNCIONAMENTO
 
-    HORARIO_FUNCIONAMENTO {
-        bigint id PK
-        bigint predio_id FK
-        bigint espaco_id FK
-        string dia_semana
-        time abertura
-        time fechamento
-        boolean ativo
-    }
+    ESPACO -->|1:N| RESERVA
+    USUARIO -->|1:N solicitante| RESERVA
+    RESERVA -->|1:N| NOTIFICACAO
+    USUARIO -->|1:N destinatario| NOTIFICACAO
 
-    RESERVA {
-        bigint id PK
-        bigint solicitante_id FK
-        bigint espaco_id FK
-        datetime inicio
-        datetime fim
-        string motivo
-        boolean cancelada
-        datetime criada_em
-    }
+    ESPACO -->|1:N| INDISPONIBILIDADE
+    USUARIO -->|1:N criadaPor| INDISPONIBILIDADE
 
-    INDISPONIBILIDADE {
-        bigint id PK
-        bigint espaco_id FK
-        bigint criada_por_id FK
-        datetime inicio
-        datetime fim
-        string motivo
-    }
+    ESPACO -->|1:N| ESPACO_RECURSO
+    RECURSO_ESPACO -->|1:N| ESPACO_RECURSO
 
-    RECURSO_ESPACO {
-        bigint id PK
-        string nome UK
-        string descricao
-    }
+    classDef table fill:#ffffff,stroke:#495057,color:#102a43
+    classDef join fill:#f1f3f5,stroke:#868e96,color:#102a43
+    classDef people fill:#e7f5ff,stroke:#1c7ed6,color:#102a43
+    classDef place fill:#e6fcf5,stroke:#0ca678,color:#102a43
+    classDef schedule fill:#fff4e6,stroke:#f08c00,color:#102a43
+    classDef comm fill:#f8f0fc,stroke:#9c36b5,color:#102a43
 
-    ESPACO_RECURSO {
-        bigint espaco_id FK
-        bigint recurso_id FK
-    }
-
-    NOTIFICACAO {
-        bigint id PK
-        bigint destinatario_id FK
-        bigint reserva_id FK
-        string mensagem
-        boolean lida
-        datetime enviada_em
-    }
+    class USUARIO people
+    class PREDIO,ESPACO,RECURSO_ESPACO place
+    class ESPACO_RECURSO join
+    class HORARIO_FUNCIONAMENTO,RESERVA,INDISPONIBILIDADE schedule
+    class NOTIFICACAO comm
 ```
 
 ### Fluxo principal de reserva
