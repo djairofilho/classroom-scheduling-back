@@ -4,9 +4,12 @@ import com.classroomscheduler.dto.AuthRequest;
 import com.classroomscheduler.dto.AuthResponse;
 import com.classroomscheduler.exception.NaoAutorizadoException;
 import com.classroomscheduler.exception.RegraDeNegocioException;
-import com.classroomscheduler.model.PapelUsuario;
+import com.classroomscheduler.model.Aluno;
+import com.classroomscheduler.model.Funcionario;
 import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.model.Usuario;
+import com.classroomscheduler.repository.AlunoRepository;
+import com.classroomscheduler.repository.FuncionarioRepository;
 import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,15 +20,21 @@ import java.util.Locale;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final AlunoRepository alunoRepository;
+    private final FuncionarioRepository funcionarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(
             UsuarioRepository usuarioRepository,
+            AlunoRepository alunoRepository,
+            FuncionarioRepository funcionarioRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService
     ) {
         this.usuarioRepository = usuarioRepository;
+        this.alunoRepository = alunoRepository;
+        this.funcionarioRepository = funcionarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -38,14 +47,12 @@ public class AuthService {
             throw new RegraDeNegocioException("Ja existe usuario com esse email.");
         }
 
-        Usuario solicitante = new Usuario();
+        Usuario solicitante = criarSolicitantePorEmail(email);
         solicitante.setEmail(email);
         solicitante.setNome(email);
-        solicitante.setPapel(PapelUsuario.SOLICITANTE);
-        solicitante.setTipoSolicitante(inferirTipoSolicitante(email));
         solicitante.setSenhaHash(passwordEncoder.encode(request.getSenha()));
 
-        Usuario salvo = usuarioRepository.save(solicitante);
+        Usuario salvo = salvarSolicitante(solicitante);
         return new AuthResponse(jwtService.gerarToken(salvo), salvo);
     }
 
@@ -85,5 +92,27 @@ public class AuthService {
         }
 
         throw new RegraDeNegocioException("Email deve ser institucional do Insper.");
+    }
+
+    private Usuario criarSolicitantePorEmail(String email) {
+        TipoSolicitante tipoSolicitante = inferirTipoSolicitante(email);
+
+        if (tipoSolicitante == TipoSolicitante.ALUNO) {
+            return new Aluno();
+        }
+
+        return new Funcionario();
+    }
+
+    private Usuario salvarSolicitante(Usuario solicitante) {
+        if (solicitante instanceof Aluno aluno) {
+            return alunoRepository.save(aluno);
+        }
+
+        if (solicitante instanceof Funcionario funcionario) {
+            return funcionarioRepository.save(funcionario);
+        }
+
+        throw new RegraDeNegocioException("Tipo de solicitante invalido.");
     }
 }

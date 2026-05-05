@@ -1,7 +1,9 @@
 package com.classroomscheduler.dto;
 
 import com.classroomscheduler.model.Usuario;
+import lombok.Getter;
 
+@Getter
 public class AuthResponse {
 
     private String token;
@@ -16,11 +18,4 @@ public class AuthResponse {
         this.usuario = new UsuarioAuthResponse(usuario);
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public UsuarioAuthResponse getUsuario() {
-        return usuario;
-    }
 }

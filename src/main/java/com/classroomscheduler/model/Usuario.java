@@ -2,19 +2,26 @@ package com.classroomscheduler.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USUARIO")
 @Getter
 @Setter
-public class Usuario {
+public abstract class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,16 +34,31 @@ public class Usuario {
 
     @JsonIgnore
     private String senhaHash;
-
-    @Enumerated(EnumType.STRING)
-    private PapelUsuario papel;
-
-    @Enumerated(EnumType.STRING)
-    private TipoSolicitante tipoSolicitante;
-
+  
     private boolean ativo = true;
 
     public Usuario() {
+    }
+
+    @Transient
+    public PapelUsuario getPapel() {
+        if (this instanceof Admin) {
+            return PapelUsuario.ADMIN;
+        }
+        return PapelUsuario.SOLICITANTE;
+    }
+
+    @Transient
+    public TipoSolicitante getTipoSolicitante() {
+        if (this instanceof Aluno) {
+            return TipoSolicitante.ALUNO;
+        }
+
+        if (this instanceof Funcionario) {
+            return TipoSolicitante.FUNCIONARIO;
+        }
+
+        return null;
     }
 
 }

@@ -1,5 +1,10 @@
 package com.classroomscheduler.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class AuthRequest {
 
     private String email;
@@ -9,19 +14,4 @@ public class AuthRequest {
     public AuthRequest() {
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
 }
