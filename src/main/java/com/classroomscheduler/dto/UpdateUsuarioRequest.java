@@ -3,15 +3,10 @@ package com.classroomscheduler.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
-public class AuthRequest {
-
+@Setter
+public class UpdateUsuarioRequest {
+    private String nome;
     private String email;
-
-    private String senha;
-
-    public AuthRequest() {
-    }
-
+    private String tipoSolicitante;
 }

@@ -3,19 +3,11 @@ package com.classroomscheduler.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
-public class CreateEspacoRequest {
-
+@Setter
+public class UpdateEspacoRequest {
     private String nome;
-
-    private String tipo;
-
     private Integer capacidade;
-
+    private String tipo;
     private Long predioId;
-
-    public CreateEspacoRequest() {
-    }
-
 }

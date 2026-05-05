@@ -1,11 +1,15 @@
 package com.classroomscheduler.controller;
 
+import com.classroomscheduler.dto.UpdateUsuarioRequest;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping({"/usuarios", "/users"})
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -23,7 +27,10 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Usuario>> listarTodos() {
+    public ResponseEntity<List<Usuario>> listarTodos(@RequestParam(required = false) String email) {
+        if (email != null && !email.isBlank()) {
+            return ResponseEntity.ok(List.of(usuarioService.buscarPorEmail(email)));
+        }
         return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
@@ -41,5 +48,19 @@ public class UsuarioController {
     public ResponseEntity<Void> remover(@PathVariable Long id) {
         usuarioService.remover(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @RequestBody UpdateUsuarioRequest request) {
+        return ResponseEntity.ok(usuarioService.atualizar(id, request));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Usuario> atualizarStatus(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> body
+    ) {
+        boolean ativo = Boolean.TRUE.equals(body.get("ativo"));
+        return ResponseEntity.ok(usuarioService.atualizarStatus(id, ativo));
     }
 }

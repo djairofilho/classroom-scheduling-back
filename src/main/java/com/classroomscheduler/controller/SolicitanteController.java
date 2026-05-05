@@ -5,6 +5,7 @@ import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.service.SolicitanteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/solicitantes")
+@RequestMapping({"/solicitantes", "/requesters"})
 public class SolicitanteController {
 
     private final SolicitanteService solicitanteService;
@@ -26,7 +27,10 @@ public class SolicitanteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Usuario>> listarTodos() {
+    public ResponseEntity<List<Usuario>> listarTodos(@RequestParam(required = false) String email) {
+        if (email != null && !email.isBlank()) {
+            return ResponseEntity.ok(List.of(solicitanteService.buscarPorEmail(email)));
+        }
         return ResponseEntity.ok(solicitanteService.listarTodos());
     }
 
@@ -43,5 +47,11 @@ public class SolicitanteController {
     @PostMapping
     public ResponseEntity<Usuario> criar(@RequestBody CreateSolicitanteRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(solicitanteService.criar(request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remover(@PathVariable Long id) {
+        solicitanteService.remover(id);
+        return ResponseEntity.noContent().build();
     }
 }
