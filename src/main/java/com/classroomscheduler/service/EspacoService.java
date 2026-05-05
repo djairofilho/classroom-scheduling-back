@@ -66,14 +66,12 @@ public class EspacoService {
         espaco.setCapacidade(request.getCapacidade());
         espaco.setPredio(predioService.buscarPorId(request.getPredioId()));
         espaco.setIndisponivel(false);
-        espaco.setMotivoIndisponibilidade(null);
         return espacoRepository.save(espaco);
     }
 
     public Espaco atualizarIndisponibilidade(Long id, boolean indisponivel, String motivo) {
         Espaco espaco = buscarPorId(id);
         espaco.setIndisponivel(indisponivel);
-        espaco.setMotivoIndisponibilidade(indisponivel ? motivo : null);
         return espacoRepository.save(espaco);
     }
 
