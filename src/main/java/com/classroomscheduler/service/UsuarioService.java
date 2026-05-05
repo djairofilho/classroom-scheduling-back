@@ -52,9 +52,6 @@ public class UsuarioService {
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
             usuario.setEmail(request.getEmail().trim().toLowerCase(Locale.ROOT));
         }
-        if (request.getTipoSolicitante() != null && !request.getTipoSolicitante().isBlank()) {
-            usuario.setTipoSolicitante(parseTipoSolicitante(request.getTipoSolicitante()));
-        }
 
         return usuarioRepository.save(usuario);
     }
