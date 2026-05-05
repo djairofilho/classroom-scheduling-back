@@ -34,6 +34,8 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private TipoSolicitante tipoSolicitante;
 
+    private boolean ativo = true;
+
     public Usuario() {
     }
 

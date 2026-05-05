@@ -15,6 +15,12 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findByCanceladaFalse();
 
+    List<Reserva> findByEspacoIdAndCanceladaFalseAndHorariosInicioBetweenOrderByHorariosInicioAsc(
+            Long espacoId,
+            LocalDateTime inicioDia,
+            LocalDateTime fimDia
+    );
+
     boolean existsByEspacoIdAndCanceladaFalseAndHorariosInicioLessThanAndHorariosFimGreaterThan(
             Long espacoId,
             LocalDateTime fim,
@@ -32,4 +38,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             Long espacoId,
             String motivo
     );
+
+    void deleteByEspacoId(Long espacoId);
 }

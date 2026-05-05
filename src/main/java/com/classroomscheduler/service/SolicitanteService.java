@@ -59,6 +59,11 @@ public class SolicitanteService {
         return usuarioRepository.save(solicitante);
     }
 
+    public void remover(Long id) {
+        Usuario solicitante = buscarPorId(id);
+        usuarioRepository.delete(solicitante);
+    }
+
     private TipoSolicitante inferirTipoSolicitante(String email) {
         if (email.endsWith("@al.insper.edu.br")) {
             return TipoSolicitante.ALUNO;

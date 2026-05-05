@@ -1,324 +1,76 @@
-# Classroom Scheduler
+# classroom-scheduling-back
 
-Sistema para agendamento de espacos da faculdade, com foco em evitar conflitos de horario e manter as regras de reserva bem definidas no dominio.
+Backend Spring Boot para o frontend `classroom-scheduling-front`.
 
-## Objetivo
+## Base
 
-O projeto organiza o processo de reserva de espacos academicos de forma simples e clara. A proposta prioriza:
+- URL local: `http://localhost:8080`
+- Auth header: `Authorization: Bearer <token>`
+- `Content-Type: application/json`
 
-- modelagem de dominio bem estruturada
-- separacao de responsabilidades entre camadas
-- regras de negocio centralizadas
-- API REST para operacoes principais de consulta, reserva e notificacao
-- autenticacao com JWT para solicitantes e administradores
+## Rodar
 
-## Escopo funcional
-
-### Solicitante
-
-- Ver espacos disponiveis
-- Filtrar espacos por capacidade, tipo e predio
-- Criar reserva
-- Cancelar a propria reserva
-- Consultar suas reservas
-- Receber notificacoes sobre alteracoes nas reservas
-
-### Admin
-
-- Criar espacos
-- Definir capacidade e localizacao
-- Marcar indisponibilidade de espacos
-- Cancelar qualquer reserva
-- Consultar notificacoes emitidas pelo sistema
-- Criar e acompanhar reservas usando sua propria conta administrativa
-
-## Dominio do problema
-
-O sistema foi ajustado para usar classes de dominio com responsabilidade real, evitando subclasses vazias. `Admin` e `Solicitante` agora sao valores do campo `papel` em `Usuario`; `Sala`, `Auditorio`, `Quadra` e `Laboratorio` sao valores do campo `tipo` em `Espaco`.
-
-- `Usuario` concentra autenticacao, papel e tipo de solicitante
-- `Espaco` concentra os dados reservaveis e usa `TipoEspaco` para diferenciar sala, auditorio, quadra e laboratorio
-- `HorarioFuncionamento` representa dias e janelas de abertura de predios e espacos
-- `Reserva` usa `HorarioReserva` para encapsular inicio, fim e validacao temporal
-- `Indisponibilidade`, `RecursoEspaco`, `PoliticaReserva` e `Notificacao` deixam regras operacionais explicitas no dominio
-- Regras de reserva centralizadas no dominio
-
-As 10 classes de dominio sao:
-
-- `Usuario`
-- `Predio`
-- `Espaco`
-- `HorarioFuncionamento`
-- `Reserva`
-- `HorarioReserva`
-- `Indisponibilidade`
-- `RecursoEspaco`
-- `Notificacao`
-- `PoliticaReserva`
-
-## Diagrama de classes
-
-O modelo conceitual abaixo resume as entidades principais. A versao completa, com diagrama de classes detalhado, visao relacional JPA e fluxo de reserva, esta em [docs/modelagem-de-dominio.md](docs/modelagem-de-dominio.md).
-
-```mermaid
-flowchart LR
-    subgraph Pessoas["Pessoas"]
-        Usuario[Usuario<br/>autenticacao e papel]
-    end
-
-    subgraph Localizacao["Espacos fisicos"]
-        Predio[Predio<br/>bloco fisico]
-        Espaco[Espaco<br/>recurso reservavel]
-        RecursoEspaco[RecursoEspaco<br/>infraestrutura]
-    end
-
-    subgraph Agenda["Agenda"]
-        HorarioFuncionamento[HorarioFuncionamento<br/>abertura recorrente]
-        Reserva[Reserva<br/>agendamento]
-        HorarioReserva[HorarioReserva<br/>inicio e fim embutidos]
-        Indisponibilidade[Indisponibilidade<br/>bloqueio planejado]
-    end
-
-    subgraph Apoio["Apoio operacional"]
-        Notificacao[Notificacao<br/>aviso]
-        PoliticaReserva[PoliticaReserva<br/>regras parametrizadas]
-    end
-
-    Usuario -->|1:N solicita| Reserva
-    Usuario -->|1:N recebe| Notificacao
-    Predio -->|1:N contem| Espaco
-    Predio -->|1:N abre em| HorarioFuncionamento
-    Espaco -->|1:N abre em| HorarioFuncionamento
-    Espaco -->|1:N recebe| Reserva
-    Espaco -->|1:N bloqueios| Indisponibilidade
-    Espaco <-->|N:N recursos| RecursoEspaco
-    Reserva -->|1:1 periodo| HorarioReserva
-    Reserva -->|1:N notifica| Notificacao
-    PoliticaReserva -.->|1:N valida| Reserva
-
-    classDef actor fill:#e7f5ff,stroke:#1c7ed6,color:#102a43
-    classDef place fill:#e6fcf5,stroke:#0ca678,color:#102a43
-    classDef schedule fill:#fff4e6,stroke:#f08c00,color:#102a43
-    classDef support fill:#f8f0fc,stroke:#9c36b5,color:#102a43
-
-    class Usuario actor
-    class Predio,Espaco,RecursoEspaco place
-    class Reserva,HorarioReserva,HorarioFuncionamento,Indisponibilidade schedule
-    class Notificacao,PoliticaReserva support
+```powershell
+.\mvnw clean spring-boot:run
 ```
 
-## Regras de negocio centrais
-
-- Nao pode existir reserva em conflito de horario para o mesmo espaco
-- Nao pode reservar espaco indisponivel
-- `HorarioReserva` deve ser valido, com fim posterior ao inicio
-- O `Solicitante` pode cancelar apenas a propria reserva
-- O `Admin` pode cancelar qualquer reserva
-- O `Admin` tambem pode criar reservas associadas a sua propria conta
-- O sistema deve gerar `Notificacao` em eventos relevantes da reserva
-
-## Autenticacao e acesso
-
-A API usa JWT. As rotas publicas principais sao:
-
-- `POST /auth/register`
-- `POST /auth/login`
-- `GET /health`
-- Swagger/OpenAPI e console H2 local
-
-As demais rotas exigem header:
-
-```http
-Authorization: Bearer <token>
-```
-
-Registro rapido:
-
-```json
-{
-  "email": "aluno@al.insper.edu.br",
-  "senha": "senha123"
-}
-```
-
-Regras do registro:
-
-- emails `@al.insper.edu.br` viram `Usuario` com `papel = SOLICITANTE` e `tipoSolicitante = ALUNO`
-- emails `@insper.edu.br` viram `Usuario` com `papel = SOLICITANTE` e `tipoSolicitante = FUNCIONARIO`
-- senhas sao armazenadas com BCrypt em `senhaHash`
-- a resposta nunca retorna `senhaHash`
-
-Login:
-
-```json
-{
-  "email": "admin@insper.edu.br",
-  "senha": "admin1234"
-}
-```
-
-Resposta de autenticacao:
-
-```json
-{
-  "token": "...",
-  "usuario": {
-    "id": 1,
-    "email": "admin@insper.edu.br",
-    "papel": "ADMIN",
-    "tipoSolicitante": null
-  }
-}
-```
-
-## Arquitetura
-
-O projeto segue uma arquitetura em camadas com Spring Boot:
-
-- `controller`: recebe e responde requisicoes HTTP
-- `service`: aplica regras de negocio e coordenacao de casos de uso
-- `repository`: acesso aos dados com Spring Data JPA
-- `model`: entidades e objetos de valor do dominio
-- `dto`: contratos de entrada e saida da API
-- `exception`: excecoes de dominio/API e tratamento padronizado de erros
-
-Estrutura atual do codigo:
-
-```text
-src/main/java/com/classroomscheduler
-|-- controller
-|-- dto
-|-- exception
-|-- model
-|-- repository
-|-- service
-`-- ApiApplication.java
-```
-
-## Endpoints atuais
+## Endpoints suportados (PT e EN)
 
 ### Auth
-
-- `POST /auth/register`
-- `POST /auth/login`
+- `POST /auth/login` e `POST /auth/sessions`
+- `POST /auth/register` e `POST /auth/users`
 - `GET /auth/me`
 
-### Espacos
+### Health
+- `GET /health` -> `{ "status": "UP", "timestamp": "ISO-8601" }`
 
-- `GET /espacos`
-- `GET /espacos/disponiveis`
-- `GET /espacos/por-predio?predioId=...`
-- `POST /espacos`
-- `PATCH /espacos/{id}/indisponibilidade`
+### Buildings
+- `GET /predios`, `GET /buildings`
+- `GET /predios/{id}`, `GET /buildings/{id}`
+- `POST /predios`, `POST /buildings`
+- `PUT /predios/{id}`, `PUT /buildings/{id}`
+- `DELETE /predios/{id}`, `DELETE /buildings/{id}`
+- Busca por codigo: `GET /predios?codigo=B1` ou `GET /buildings?code=B1`
 
-### Reservas
+### Spaces
+- `GET /espacos`, `GET /spaces`
+- `GET /espacos/{id}`, `GET /spaces/{id}`
+- `POST /espacos`, `POST /spaces`
+- `PUT /espacos/{id}`, `PUT /spaces/{id}`
+- `DELETE /espacos/{id}`, `DELETE /spaces/{id}`
+- `PATCH /espacos/{id}/indisponibilidade`, `PATCH /spaces/{id}/availability`
+- Filtros:
+  - `GET /spaces?available=true`
+  - `GET /spaces?buildingId=1` (ou `predioId=1`)
 
-- `POST /reservas`
-- `GET /reservas`
-- `GET /reservas/{id}`
-- `GET /reservas/ativas`
-- `GET /reservas/por-solicitante?solicitanteId=...`
-- `PATCH /reservas/{id}/cancelar`
+### Reservations
+- `GET /reservas`, `GET /reservations`
+- `GET /reservas/{id}`, `GET /reservations/{id}`
+- `POST /reservas`, `POST /reservations`
+- `PATCH /reservas/{id}/cancelar`, `PATCH /reservations/{id}/cancel`
+- Filtros:
+  - `GET /reservations?status=ACTIVE`
+  - `GET /reservations?requesterId=10` (ou `solicitanteId=10`)
+  - `GET /reservations?spaceId=7&from=2026-05-10T14:00:00&to=2026-05-10T16:00:00`
 
-### Solicitantes, usuarios e notificacoes
+### Notifications
+- `GET /notificacoes`, `GET /notifications`
+- `GET /notificacoes/{id}`, `GET /notifications/{id}`
+- `PATCH /notificacoes/{id}/lida`, `PATCH /notifications/{id}/read`
+- Filtros:
+  - `GET /notifications?recipientId=10` (ou `destinatarioId=10`)
+  - `GET /notifications?recipientId=10&read=false`
 
-- `GET /solicitantes`
-- `POST /solicitantes`
-- `GET /usuarios`
-- `GET /notificacoes`
-- `POST /notificacoes`
-- `PATCH /notificacoes/{id}/lida`
+### Users / Requesters
+- `GET /usuarios`, `GET /users`
+- `GET /usuarios/{id}`, `GET /users/{id}`
+- `GET /usuarios?email=x@y.com`, `GET /users?email=x@y.com`
+- `PUT /usuarios/{id}`, `PUT /users/{id}`
+- `PATCH /usuarios/{id}/status`, `PATCH /users/{id}/status`
+- `DELETE /usuarios/{id}`, `DELETE /users/{id}`
 
-Os detalhes de contratos e exemplos estao em [docs/endpoints.md](docs/endpoints.md).
-
-## Como executar
-
-Pre-requisitos:
-
-- JDK instalado
-- `JAVA_HOME` configurado
-- Java 25, conforme `pom.xml`
-
-Executar a aplicacao:
-
-```powershell
-.\mvnw spring-boot:run
-```
-
-Por padrao, a aplicacao sobe com uma seed local de demonstracao habilitada. Ela cria:
-
-- um usuario admin padrao (`admin@insper.edu.br` / `admin1234`)
-- dois `Predios`
-- quatro `Espacos`
-- horarios de funcionamento dos predios e de espacos de demonstracao
-- recursos de espaco e uma politica padrao de reserva
-- dois usuarios solicitantes
-- uma `Reserva` futura para solicitante
-- uma `Reserva` futura para admin
-- `Notificacoes` iniciais para explorar a API
-
-Variaveis uteis:
-
-```powershell
-$env:APP_ADMIN_NOME='Administrador Padrao'
-$env:APP_ADMIN_EMAIL='admin@insper.edu.br'
-$env:APP_ADMIN_PASSWORD='admin1234'
-$env:APP_JWT_SECRET='dev-secret-key-change-me-dev-secret-key-change-me'
-$env:APP_JWT_EXPIRATION_MILLIS='7200000'
-```
-
-Para desligar a seed local, defina:
-
-```powershell
-$env:APP_DEMO_DATA_ENABLED='false'
-.\mvnw spring-boot:run
-```
-
-Executar testes:
-
-```powershell
-.\mvnw test
-```
-
-Aplicacao local:
-
-```text
-http://localhost:8080
-```
-
-Documentacao OpenAPI / Swagger UI:
-
-```text
-http://localhost:8080/docs/swagger-ui.html
-```
-
-## Banco de dados
-
-O projeto esta configurado com H2 em memoria em [src/main/resources/application.properties](src/main/resources/application.properties).
-
-- JDBC URL: `jdbc:h2:mem:testdb`
-- Usuario: `sa`
-- Senha: em branco
-- Console H2 habilitado
-
-Console H2:
-
-```text
-http://localhost:8080/h2-console
-```
-
-Como o banco esta em memoria, os dados sao perdidos ao encerrar a aplicacao.
-
-## Documentacao complementar
-
-- [Modelagem de dominio](docs/modelagem-de-dominio.md)
-- [Regras de negocio](docs/regras-de-negocio.md)
-- [Endpoints da API](docs/endpoints.md)
-- [Contrato OpenAPI](docs/openapi.json)
-- [Collection Postman](docs/api-collection.postman_collection.json)
-- [Backlog do produto](docs/backlog-do-produto.md)
-- [Padrao de commits e PRs](docs/padrao-de-commits-e-prs.md)
-
-## Observacao
-
-Esta documentacao usa como base as classes de dominio do projeto e deve servir como guia direto para a implementacao.
+- `GET /solicitantes`, `GET /requesters`
+- `GET /solicitantes/{id}`, `GET /requesters/{id}`
+- `GET /solicitantes?email=x@y.com`, `GET /requesters?email=x@y.com`
+- `POST /solicitantes`, `POST /requesters`
+- `DELETE /solicitantes/{id}`, `DELETE /requesters/{id}`
