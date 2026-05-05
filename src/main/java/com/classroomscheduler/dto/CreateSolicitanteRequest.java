@@ -5,17 +5,18 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateFuncionarioRequest {
+public class CreateSolicitanteRequest {
 
     private String nome;
 
     private String email;
 
+    private String numeroMatricula;
+
     private String numeroCracha;
 
     private String cargo;
 
-    public CreateFuncionarioRequest() {
+    public CreateSolicitanteRequest() {
     }
-
 }

@@ -11,7 +11,16 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmail(String email);
 
-    Optional<Usuario> findByEmailAndPapel(String email, PapelUsuario papel);
+    List<Usuario> findByNome(String nome);
 
-    List<Usuario> findByPapel(PapelUsuario papel);
+    default Optional<Usuario> findByEmailAndPapel(String email, PapelUsuario papel) {
+        return findByEmail(email)
+                .filter(usuario -> usuario.getPapel() == papel);
+    }
+
+    default List<Usuario> findByPapel(PapelUsuario papel) {
+        return findAll().stream()
+                .filter(usuario -> usuario.getPapel() == papel)
+                .toList();
+    }
 }

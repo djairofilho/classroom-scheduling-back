@@ -1,21 +1,21 @@
 package com.classroomscheduler.config;
 
+import com.classroomscheduler.model.Admin;
+import com.classroomscheduler.model.Aluno;
 import com.classroomscheduler.model.DiaSemana;
 import com.classroomscheduler.model.Espaco;
+import com.classroomscheduler.model.Funcionario;
 import com.classroomscheduler.model.HorarioFuncionamento;
 import com.classroomscheduler.model.HorarioReserva;
 import com.classroomscheduler.model.Notificacao;
-import com.classroomscheduler.model.PapelUsuario;
 import com.classroomscheduler.model.Predio;
 import com.classroomscheduler.model.Reserva;
 import com.classroomscheduler.model.TipoEspaco;
-import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.EspacoRepository;
 import com.classroomscheduler.repository.HorarioFuncionamentoRepository;
 import com.classroomscheduler.repository.NotificacaoRepository;
 import com.classroomscheduler.repository.PredioRepository;
-import com.classroomscheduler.repository.RecursoEspacoRepository;
 import com.classroomscheduler.repository.ReservaRepository;
 import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -324,15 +324,9 @@ public class DemoDataConfig {
         String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
         return usuarioRepository.findByEmail(emailNormalizado)
                 .orElseGet(() -> {
-                    Usuario solicitante = new Usuario();
+                    Usuario solicitante = criarSolicitanteDemo(emailNormalizado);
                     solicitante.setNome(emailNormalizado);
                     solicitante.setEmail(emailNormalizado);
-                    solicitante.setPapel(PapelUsuario.SOLICITANTE);
-                    solicitante.setTipoSolicitante(
-                            emailNormalizado.endsWith("@al.insper.edu.br")
-                                    ? TipoSolicitante.ALUNO
-                                    : TipoSolicitante.FUNCIONARIO
-                    );
                     return usuarioRepository.save(solicitante);
                 });
     }
@@ -347,13 +341,25 @@ public class DemoDataConfig {
         String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
         return usuarioRepository.findByEmail(emailNormalizado)
                 .orElseGet(() -> {
-                    Usuario admin = new Usuario();
+                    Usuario admin = new Admin();
                     admin.setNome(nome);
                     admin.setEmail(emailNormalizado);
-                    admin.setPapel(PapelUsuario.ADMIN);
                     admin.setSenhaHash(passwordEncoder.encode(senha));
                     return usuarioRepository.save(admin);
                 });
+    }
+
+    private Usuario criarSolicitanteDemo(String emailNormalizado) {
+        if (emailNormalizado.endsWith("@al.insper.edu.br")) {
+            Aluno aluno = new Aluno();
+            aluno.setNumeroMatricula("DEMO-" + Math.abs(emailNormalizado.hashCode()));
+            return aluno;
+        }
+
+        Funcionario funcionario = new Funcionario();
+        funcionario.setNumeroCracha("DEMO-" + Math.abs(emailNormalizado.hashCode()));
+        funcionario.setCargo("Funcionario");
+        return funcionario;
     }
 
     private Espaco buscarOuCriarEspaco(

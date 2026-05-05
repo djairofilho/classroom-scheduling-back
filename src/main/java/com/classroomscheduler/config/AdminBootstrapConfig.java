@@ -1,7 +1,7 @@
 package com.classroomscheduler.config;
 
-import com.classroomscheduler.model.PapelUsuario;
-import com.classroomscheduler.model.Usuario;
+import com.classroomscheduler.model.Admin;
+import com.classroomscheduler.repository.AdminRepository;
 import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +17,7 @@ public class AdminBootstrapConfig {
     @Bean
     public CommandLineRunner adminBootstrapRunner(
             UsuarioRepository usuarioRepository,
+            AdminRepository adminRepository,
             PasswordEncoder passwordEncoder,
             @Value("${APP_ADMIN_NOME:Administrador Padrao}") String adminNome,
             @Value("${APP_ADMIN_EMAIL:admin@insper.edu.br}") String adminEmail,
@@ -28,12 +29,11 @@ public class AdminBootstrapConfig {
                 return;
             }
 
-            Usuario admin = new Usuario();
+            Admin admin = new Admin();
             admin.setNome(adminNome);
             admin.setEmail(emailNormalizado);
-            admin.setPapel(PapelUsuario.ADMIN);
             admin.setSenhaHash(passwordEncoder.encode(adminPassword));
-            usuarioRepository.save(admin);
+            adminRepository.save(admin);
         };
     }
 }

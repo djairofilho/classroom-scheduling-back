@@ -1,15 +1,20 @@
 package com.classroomscheduler.model;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@DiscriminatorValue("FUNCIONARIO")
 @Getter
 @Setter
-public class Funcionario extends Usuario{
+public class Funcionario extends Usuario {
 
-    String numeroCracha;
+    private String numeroCracha;
 
-    String cargo;
+    private String cargo;
+
+    public Funcionario() {
+    }
 }
