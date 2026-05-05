@@ -1,6 +1,8 @@
 package com.classroomscheduler.controller;
 
 import com.classroomscheduler.dto.CreateReservaRequest;
+import com.classroomscheduler.dto.ReservaLoteRequest;
+import com.classroomscheduler.dto.ReservaLoteResponse;
 import com.classroomscheduler.exception.AcessoNegadoException;
 import com.classroomscheduler.exception.NaoAutorizadoException;
 import com.classroomscheduler.model.PapelUsuario;
@@ -86,6 +88,11 @@ public class ReservaController {
             request.setSolicitanteId(usuario.getId());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.criar(request));
+    }
+
+    @PostMapping({"/lote", "/bulk"})
+    public ResponseEntity<ReservaLoteResponse> criarLote(@RequestBody ReservaLoteRequest request) {
+        return ResponseEntity.ok(reservaService.criarLote(request));
     }
 
     @PatchMapping({"/{id}/cancelar", "/{id}/cancel"})

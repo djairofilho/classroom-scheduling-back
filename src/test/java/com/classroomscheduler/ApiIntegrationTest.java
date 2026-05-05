@@ -158,17 +158,21 @@ class ApiIntegrationTest {
     void patchAprovarERecusarAtualizamStatus() throws Exception {
         Predio predio = criarPredio("A", "Predio A");
         Espaco espaco = criarEspaco(predio, "Sala 1", TipoEspaco.SALA);
-        Reserva reserva = reservaRepository.save(criarReserva(
+        Reserva pendenteParaAprovar = reservaRepository.save(criarReserva(
                 user, espaco, LocalDateTime.of(2026, 5, 10, 9, 0), LocalDateTime.of(2026, 5, 10, 10, 0),
                 StatusReserva.PENDENTE, false
         ));
+        Reserva pendenteParaRecusar = reservaRepository.save(criarReserva(
+                user, espaco, LocalDateTime.of(2026, 5, 10, 11, 0), LocalDateTime.of(2026, 5, 10, 12, 0),
+                StatusReserva.PENDENTE, false
+        ));
 
-        HttpResponse<String> aprovar = send("PATCH", "/reservas/" + reserva.getId() + "/aprovar", adminToken, "");
+        HttpResponse<String> aprovar = send("PATCH", "/reservas/" + pendenteParaAprovar.getId() + "/aprovar", adminToken, "");
         JsonNode aprovado = objectMapper.readTree(aprovar.body());
         assertEquals(200, aprovar.statusCode());
         assertEquals("APROVADA", aprovado.get("status").asText());
 
-        HttpResponse<String> recusar = send("PATCH", "/reservas/" + reserva.getId() + "/recusar", adminToken, "");
+        HttpResponse<String> recusar = send("PATCH", "/reservas/" + pendenteParaRecusar.getId() + "/recusar", adminToken, "");
         JsonNode recusado = objectMapper.readTree(recusar.body());
         assertEquals(200, recusar.statusCode());
         assertEquals("RECUSADA", recusado.get("status").asText());
@@ -202,6 +206,7 @@ class ApiIntegrationTest {
         String email = "malicioso" + System.nanoTime() + "@al.insper.edu.br";
         String body = """
                 {
+                  "nome": "Usuario Malicioso",
                   "email": "%s",
                   "senha": "senha123",
                   "papel": "ADMIN"
@@ -219,6 +224,66 @@ class ApiIntegrationTest {
     void listarAtivasFuncionaParaUser() throws Exception {
         HttpResponse<String> response = get(userToken, "/reservas/ativas");
         assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void cancelarReservaAprovadaComSucesso() throws Exception {
+        Predio predio = criarPredio("A", "Predio A");
+        Espaco espaco = criarEspaco(predio, "Sala 1", TipoEspaco.SALA);
+        Reserva reserva = reservaRepository.save(criarReserva(
+                user, espaco, LocalDateTime.of(2026, 5, 10, 15, 0), LocalDateTime.of(2026, 5, 10, 16, 0),
+                StatusReserva.APROVADA, false
+        ));
+
+        HttpResponse<String> response = send("PATCH", "/reservas/" + reserva.getId() + "/cancelar", adminToken, "");
+        JsonNode json = objectMapper.readTree(response.body());
+
+        assertEquals(200, response.statusCode());
+        assertEquals("CANCELADA", json.get("status").asText());
+        assertEquals(true, json.get("cancelada").asBoolean());
+    }
+
+    @Test
+    void userNaoAcessaListagemAdminReservas() throws Exception {
+        HttpResponse<String> response = get(userToken, "/reservas");
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void loteCriaSomenteValidasEContaIgnoradas() throws Exception {
+        Predio predio = criarPredio("A", "Predio A");
+        Espaco espaco = criarEspaco(predio, "Sala 1", TipoEspaco.SALA);
+
+        reservaRepository.save(criarReserva(
+                user, espaco,
+                LocalDateTime.of(2026, 5, 6, 19, 0),
+                LocalDateTime.of(2026, 5, 6, 21, 0),
+                StatusReserva.APROVADA, false
+        ));
+
+        String body = """
+                {
+                  "solicitanteId": %d,
+                  "espacoId": %d,
+                  "dataInicio": "2026-05-05",
+                  "dataFim": "2026-05-07",
+                  "diasSemana": [2,3,4],
+                  "horaInicio": "19:00",
+                  "horaFim": "21:00",
+                  "motivo": "Aula recorrente",
+                  "statusInicial": "APROVADA",
+                  "aprovacaoAutomatica": true
+                }
+                """.formatted(user.getId(), espaco.getId());
+
+        HttpResponse<String> response = send("POST", "/reservas/lote", adminToken, body);
+        JsonNode json = objectMapper.readTree(response.body());
+
+        assertEquals(200, response.statusCode());
+        assertEquals(2, json.get("quantidadeCriada").asInt());
+        assertEquals(1, json.get("quantidadeIgnorada").asInt());
+        assertEquals(2, json.get("idsCriados").size());
+        assertEquals(1, json.get("conflitos").size());
     }
 
     private Predio criarPredio(String codigo, String nome) {
@@ -304,6 +369,7 @@ class ApiIntegrationTest {
     private String registrarUsuario(String email, String senha) throws Exception {
         String body = """
                 {
+                  "nome": "Usuario Teste",
                   "email": "%s",
                   "senha": "%s"
                 }

@@ -40,6 +40,7 @@ public class AuthService {
     }
 
     public AuthResponse registrar(AuthRequest request) {
+        String nome = validarNome(request.getNome());
         String email = normalizarEmail(request.getEmail());
         validarSenha(request.getSenha());
 
@@ -49,7 +50,7 @@ public class AuthService {
 
         Usuario solicitante = criarSolicitantePorEmail(email);
         solicitante.setEmail(email);
-        solicitante.setNome(email);
+        solicitante.setNome(nome);
         solicitante.setSenhaHash(passwordEncoder.encode(request.getSenha()));
 
         Usuario salvo = salvarSolicitante(solicitante);
@@ -80,6 +81,13 @@ public class AuthService {
         if (senha == null || senha.length() < 6) {
             throw new RegraDeNegocioException("Senha deve possuir pelo menos 6 caracteres.");
         }
+    }
+
+    private String validarNome(String nome) {
+        if (nome == null || nome.isBlank()) {
+            throw new RegraDeNegocioException("Nome e obrigatorio.");
+        }
+        return nome.trim();
     }
 
     private TipoSolicitante inferirTipoSolicitante(String email) {
