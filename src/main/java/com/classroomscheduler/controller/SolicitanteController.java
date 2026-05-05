@@ -1,6 +1,6 @@
 package com.classroomscheduler.controller;
 
-import com.classroomscheduler.dto.CreateSolicitanteRequest;
+import com.classroomscheduler.dto.CreateAlunoRequest;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.service.SolicitanteService;
 import org.springframework.http.HttpStatus;
@@ -41,7 +41,7 @@ public class SolicitanteController {
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> criar(@RequestBody CreateSolicitanteRequest request) {
+    public ResponseEntity<Usuario> criar(@RequestBody CreateAlunoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(solicitanteService.criar(request));
     }
 }

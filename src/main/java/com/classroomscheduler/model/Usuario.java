@@ -28,9 +28,6 @@ public class Usuario {
     @JsonIgnore
     private String senhaHash;
 
-    @Enumerated(EnumType.STRING)
-    private TipoSolicitante tipoSolicitante;
-
     public Usuario() {
     }
 

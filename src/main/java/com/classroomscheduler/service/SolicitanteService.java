@@ -1,6 +1,6 @@
 package com.classroomscheduler.service;
 
-import com.classroomscheduler.dto.CreateSolicitanteRequest;
+import com.classroomscheduler.dto.CreateAlunoRequest;
 import com.classroomscheduler.exception.RecursoNaoEncontradoException;
 import com.classroomscheduler.exception.RegraDeNegocioException;
 import com.classroomscheduler.model.PapelUsuario;
@@ -36,7 +36,7 @@ public class SolicitanteService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitante nao encontrado."));
     }
 
-    public Usuario criar(CreateSolicitanteRequest request) {
+    public Usuario criar(CreateAlunoRequest request) {
         if (request.getNome() == null || request.getNome().isBlank()) {
             throw new RegraDeNegocioException("Solicitante deve possuir nome.");
         }

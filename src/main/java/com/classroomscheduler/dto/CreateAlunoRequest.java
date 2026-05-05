@@ -5,13 +5,15 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class AuthRequest {
+public class CreateAlunoRequest {
+
+    private String nome;
 
     private String email;
 
-    private String senha;
+    private String numeroMatricula;
 
-    public AuthRequest() {
+    public CreateAlunoRequest() {
     }
 
 }
