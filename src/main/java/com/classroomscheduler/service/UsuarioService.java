@@ -1,11 +1,15 @@
 package com.classroomscheduler.service;
 
+import com.classroomscheduler.dto.UpdateUsuarioRequest;
 import com.classroomscheduler.exception.RecursoNaoEncontradoException;
+import com.classroomscheduler.exception.RegraDeNegocioException;
+import com.classroomscheduler.model.TipoSolicitante;
 import com.classroomscheduler.model.Usuario;
 import com.classroomscheduler.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UsuarioService {
@@ -35,6 +39,37 @@ public class UsuarioService {
     }
 
     public void remover(Long id) {
-        usuarioRepository.deleteById(id);
+        Usuario usuario = buscarPorId(id);
+        usuarioRepository.delete(usuario);
+    }
+
+    public Usuario atualizar(Long id, UpdateUsuarioRequest request) {
+        Usuario usuario = buscarPorId(id);
+
+        if (request.getNome() != null && !request.getNome().isBlank()) {
+            usuario.setNome(request.getNome());
+        }
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            usuario.setEmail(request.getEmail().trim().toLowerCase(Locale.ROOT));
+        }
+        if (request.getTipoSolicitante() != null && !request.getTipoSolicitante().isBlank()) {
+            usuario.setTipoSolicitante(parseTipoSolicitante(request.getTipoSolicitante()));
+        }
+
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario atualizarStatus(Long id, boolean ativo) {
+        Usuario usuario = buscarPorId(id);
+        usuario.setAtivo(ativo);
+        return usuarioRepository.save(usuario);
+    }
+
+    private TipoSolicitante parseTipoSolicitante(String tipoSolicitante) {
+        try {
+            return TipoSolicitante.valueOf(tipoSolicitante.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            throw new RegraDeNegocioException("Tipo de solicitante invalido.");
+        }
     }
 }

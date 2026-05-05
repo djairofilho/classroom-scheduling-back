@@ -28,12 +28,12 @@ public class AuthController {
         this.usuarioRepository = usuarioRepository;
     }
 
-    @PostMapping("/register")
+    @PostMapping({"/register", "/users"})
     public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.registrar(request));
     }
 
-    @PostMapping("/login")
+    @PostMapping({"/login", "/sessions"})
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }

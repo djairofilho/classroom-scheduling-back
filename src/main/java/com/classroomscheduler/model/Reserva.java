@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
@@ -40,6 +42,9 @@ public class Reserva {
 
     private boolean cancelada;
 
+    @Enumerated(EnumType.STRING)
+    private StatusReserva status;
+
     private LocalDateTime criadaEm;
 
     public Reserva() {
@@ -50,6 +55,9 @@ public class Reserva {
         validarReserva();
         if (criadaEm == null) {
             criadaEm = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = StatusReserva.PENDENTE;
         }
     }
 

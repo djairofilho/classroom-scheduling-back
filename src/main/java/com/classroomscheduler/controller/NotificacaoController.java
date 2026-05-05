@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notificacoes")
+@RequestMapping({"/notificacoes", "/notifications"})
 public class NotificacaoController {
 
     private final NotificacaoService notificacaoService;
@@ -34,8 +34,21 @@ public class NotificacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Notificacao>> listarTodas() {
-        return ResponseEntity.ok(notificacaoService.listarTodas());
+    public ResponseEntity<List<Notificacao>> listarTodas(
+            @RequestParam(required = false) Long destinatarioId,
+            @RequestParam(required = false, name = "recipientId") Long recipientId,
+            @RequestParam(required = false) Boolean read,
+            Authentication authentication
+    ) {
+        Long selectedRecipientId = destinatarioId != null ? destinatarioId : recipientId;
+        if (selectedRecipientId == null) {
+            return ResponseEntity.ok(notificacaoService.listarTodas());
+        }
+        validarAcessoDestinatario(selectedRecipientId, authentication);
+        if (Boolean.FALSE.equals(read)) {
+            return ResponseEntity.ok(notificacaoService.listarNaoLidas(selectedRecipientId));
+        }
+        return ResponseEntity.ok(notificacaoService.listarPorDestinatario(selectedRecipientId));
     }
 
     @GetMapping("/{id}")
@@ -60,7 +73,7 @@ public class NotificacaoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(notificacaoService.salvar(notificacao));
     }
 
-    @PatchMapping("/{id}/lida")
+    @PatchMapping({"/{id}/lida", "/{id}/read"})
     public ResponseEntity<Notificacao> marcarComoLida(@PathVariable Long id, Authentication authentication) {
         Notificacao notificacao = notificacaoService.buscarPorId(id);
         validarAcessoDestinatario(notificacao.getDestinatario().getId(), authentication);

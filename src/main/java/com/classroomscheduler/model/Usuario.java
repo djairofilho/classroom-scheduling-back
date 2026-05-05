@@ -34,6 +34,8 @@ public abstract class Usuario {
 
     @JsonIgnore
     private String senhaHash;
+  
+    private boolean ativo = true;
 
     public Usuario() {
     }
@@ -43,7 +45,6 @@ public abstract class Usuario {
         if (this instanceof Admin) {
             return PapelUsuario.ADMIN;
         }
-
         return PapelUsuario.SOLICITANTE;
     }
 

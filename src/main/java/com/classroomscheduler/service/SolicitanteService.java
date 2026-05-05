@@ -70,6 +70,11 @@ public class SolicitanteService {
         return salvarSolicitante(solicitante);
     }
 
+    public void remover(Long id) {
+        Usuario solicitante = buscarPorId(id);
+        usuarioRepository.delete(solicitante);
+    }
+
     private TipoSolicitante inferirTipoSolicitante(String email) {
         if (email.endsWith("@al.insper.edu.br")) {
             return TipoSolicitante.ALUNO;
